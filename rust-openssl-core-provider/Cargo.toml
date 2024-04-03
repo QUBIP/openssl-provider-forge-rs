@@ -1,0 +1,8 @@
+[package]
+name = "rust-openssl-core-provider"
+edition = "2021"
+version = "0.0.1"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
