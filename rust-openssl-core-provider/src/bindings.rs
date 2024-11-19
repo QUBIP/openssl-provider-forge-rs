@@ -36,12 +36,13 @@ use ::std::os::raw::c_int;
 // that uniquely identifies that function. It's not a pointer to it, unless you
 // cast it. See:
 // https://users.rust-lang.org/t/casting-function-pointers-with-different-linkage/31488/2
+#[macro_export]
 macro_rules! generic_non_null_fn_ptr {
     ($address:expr) => {
         std::mem::transmute::<*const (), unsafe extern "C" fn()>($address as _)
     };
 }
-pub(crate) use generic_non_null_fn_ptr;
+pub use generic_non_null_fn_ptr;
 
 pub type GenericNullableFnPtr = ::std::option::Option<unsafe extern "C" fn()>;
 
@@ -66,6 +67,7 @@ impl Default for OSSL_DISPATCH {
 }
 
 /// A convenience macro to quickly declare a OSSL_DISPATCH table entry
+#[macro_export]
 macro_rules! dispatch_table_entry {
     ( $f_id:expr, $f_name:expr ) => {
         OSSL_DISPATCH::new(
@@ -77,4 +79,4 @@ macro_rules! dispatch_table_entry {
         )
     };
 }
-pub(crate) use dispatch_table_entry;
+pub use dispatch_table_entry;
