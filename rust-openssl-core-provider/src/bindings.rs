@@ -69,7 +69,13 @@ impl Default for OSSL_DISPATCH {
 /// A convenience macro to quickly declare a OSSL_DISPATCH table entry
 #[macro_export]
 macro_rules! dispatch_table_entry {
-    ( $f_id:expr, $f_name:expr ) => {
+    ( $f_id:expr, $f_type:ty, $f_name:expr ) => {{
+        // This function "does nothing" (and is optimized away entirely in a release build), but it
+        // prevents the code it's used in from compiling at all if it's called with an argument _f
+        // that is not of type F.
+        // Defining it inside the macro prevents it from being visible as an export of this module.
+        fn check_dispatch_table_entry_type<F>(_f: F) {}
+        check_dispatch_table_entry_type::<$f_type>(Some($f_name));
         OSSL_DISPATCH::new(
             // Why we need to cast the function ID: bindgen has to guess
             // at the type for `#define`d constants, and it guesses u32,
@@ -77,6 +83,6 @@ macro_rules! dispatch_table_entry {
             $f_id as i32,
             Some(unsafe { crate::bindings::generic_non_null_fn_ptr!($f_name) }),
         )
-    };
+    }};
 }
 pub use dispatch_table_entry;
