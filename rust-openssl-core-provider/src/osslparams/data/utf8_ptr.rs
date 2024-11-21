@@ -28,19 +28,16 @@ impl<'a> OSSLParamGetter<&'a CStr> for OSSLParam {
 
 impl TypedOSSLParamData<*const CStr> for Utf8PtrData {
     fn set(&mut self, value: *const CStr) -> Result<(), OSSLParamError> {
-        unsafe {
-            if value.is_null() {
-                return Err("new value for parameter data was null".to_string());
-            } else if (*self.param).data.is_null() {
-                (*self.param).return_size = 0;
-            } else {
-                match value.as_ref() {
-                    Some(cstr) => {
-                        (*self.param).return_size = cstr.to_bytes().len();
-                        *((*self.param).data as *mut *const c_char) = cstr.as_ptr();
-                    },
-                    None => return Err("couldn't get &CStr from *const CStr".to_string()),
-                }
+        let mut p = unsafe { *self.param };
+        if p.data.is_null() {
+            p.return_size = 0;
+        } else {
+            match unsafe { value.as_ref() } {
+                Some(cstr) => {
+                    p.return_size = cstr.to_bytes().len();
+                    unsafe { *(p.data as *mut *const c_char) = cstr.as_ptr() };
+                },
+                None => return Err("couldn't get &CStr from *const CStr".to_string()),
             }
         }
         Ok(())

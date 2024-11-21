@@ -78,31 +78,30 @@ impl OSSLParamGetter<i64> for OSSLParam {
 impl<T: PrimIntMarker> TypedOSSLParamData<T> for IntData {
     // https://github.com/openssl/openssl/blob/7f62adaf2b088de38ad2e534d0bfae2ff7ae01f2/crypto/params.c#L780-L796
     fn set(&mut self, value: T) -> Result<(), OSSLParamError> {
-        unsafe {
-            (*self.param).return_size = size_of::<i64>();
-            if (*self.param).data.is_null() {
-                Ok(())
-            } else {
-                match (*self.param).data_size {
-                    s if s == size_of::<i32>() => {
-                        if let Some(x) = value.to_i32() {
-                            (*self.param).return_size = size_of::<i32>();
-                            std::ptr::write((*self.param).data as *mut i32, x);
-                            Ok(())
-                        } else {
-                            Err("value could not be converted to i32".to_string())
-                        }
-                    },
-                    s if s == size_of::<i64>() => {
-                        if let Some(x) = value.to_i64() {
-                            std::ptr::write((*self.param).data as *mut i64, x);
-                            Ok(())
-                        } else {
-                            Err("value could not be converted to i64".to_string())
-                        }
-                    },
-                    _ => Err("param.data_size was neither the size of i32 nor of i64".to_string()),
-                }
+        let mut p = unsafe { *self.param };
+        p.return_size = size_of::<i64>();
+        if p.data.is_null() {
+            Ok(())
+        } else {
+            match p.data_size {
+                s if s == size_of::<i32>() => {
+                    if let Some(x) = value.to_i32() {
+                        p.return_size = size_of::<i32>();
+                        unsafe { std::ptr::write(p.data as *mut i32, x) };
+                        Ok(())
+                    } else {
+                        Err("value could not be converted to i32".to_string())
+                    }
+                },
+                s if s == size_of::<i64>() => {
+                    if let Some(x) = value.to_i64() {
+                        unsafe { std::ptr::write(p.data as *mut i64, x) };
+                        Ok(())
+                    } else {
+                        Err("value could not be converted to i64".to_string())
+                    }
+                },
+                _ => Err("param.data_size was neither the size of i32 nor of i64".to_string()),
             }
         }
     }

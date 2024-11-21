@@ -73,31 +73,30 @@ impl OSSLParamGetter<u64> for OSSLParam {
 impl<T: PrimUIntMarker> TypedOSSLParamData<T> for UIntData {
     // https://github.com/openssl/openssl/blob/7f62adaf2b088de38ad2e534d0bfae2ff7ae01f2/crypto/params.c#L937-L951
     fn set(&mut self, value: T) -> Result<(), OSSLParamError> {
-        unsafe {
-            (*self.param).return_size = size_of::<u64>();
-            if (*self.param).data.is_null() {
-                Ok(())
-            } else {
-                match (*self.param).data_size {
-                    s if s == size_of::<u32>() => {
-                        if let Some(x) = value.to_u32() {
-                            (*self.param).return_size = size_of::<u32>();
-                            std::ptr::write((*self.param).data as *mut u32, x);
-                            Ok(())
-                        } else {
-                            Err("value could not be converted to u32".to_string())
-                        }
-                    },
-                    s if s == size_of::<u64>() => {
-                        if let Some(x) = value.to_u64() {
-                            std::ptr::write((*self.param).data as *mut u64, x);
-                            Ok(())
-                        } else {
-                            Err("value could not be converted to u64".to_string())
-                        }
-                    },
-                    _ => Err("param.data_size was neither the size of u32 nor of u64".to_string()),
-                }
+        let mut p = unsafe { *self.param };
+        p.return_size = size_of::<u64>();
+        if p.data.is_null() {
+            Ok(())
+        } else {
+            match p.data_size {
+                s if s == size_of::<u32>() => {
+                    if let Some(x) = value.to_u32() {
+                        p.return_size = size_of::<u32>();
+                        unsafe { std::ptr::write(p.data as *mut u32, x) };
+                        Ok(())
+                    } else {
+                        Err("value could not be converted to u32".to_string())
+                    }
+                },
+                s if s == size_of::<u64>() => {
+                    if let Some(x) = value.to_u64() {
+                        unsafe { std::ptr::write(p.data as *mut u64, x) };
+                        Ok(())
+                    } else {
+                        Err("value could not be converted to u64".to_string())
+                    }
+                },
+                _ => Err("param.data_size was neither the size of u32 nor of u64".to_string()),
             }
         }
     }
