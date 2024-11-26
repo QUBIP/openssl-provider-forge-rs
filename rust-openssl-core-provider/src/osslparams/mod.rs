@@ -3,7 +3,9 @@ use std::ffi::CStr;
 use crate::bindings::{OSSL_PARAM_INTEGER, OSSL_PARAM_UNSIGNED_INTEGER, OSSL_PARAM_UTF8_PTR, ossl_param_st};
 
 pub mod data;
-mod test;
+
+#[cfg(test)]
+mod tests;
 
 // List of supported types: https://docs.openssl.org/master/man3/OSSL_PARAM/#supported-types
 #[derive(Debug, Clone)]
