@@ -28,7 +28,7 @@ impl<'a> OSSLParamGetter<&'a CStr> for OSSLParam {
 
 impl TypedOSSLParamData<*const CStr> for Utf8PtrData {
     fn set(&mut self, value: *const CStr) -> Result<(), OSSLParamError> {
-        let mut p = unsafe { *self.param };
+        let p = unsafe { &mut *self.param };
         if p.data.is_null() {
             p.return_size = 0;
         } else {
