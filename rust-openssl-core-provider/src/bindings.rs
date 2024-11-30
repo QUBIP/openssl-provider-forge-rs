@@ -86,3 +86,18 @@ macro_rules! dispatch_table_entry {
     }};
 }
 pub use dispatch_table_entry;
+
+impl OSSL_ALGORITHM {
+    pub const END: Self = Self {
+        algorithm_names: std::ptr::null(),
+        property_definition: std::ptr::null(),
+        implementation: std::ptr::null(),
+        algorithm_description: std::ptr::null(),
+    };
+}
+
+impl Default for OSSL_ALGORITHM {
+    fn default() -> Self {
+        Self::END
+    }
+}
