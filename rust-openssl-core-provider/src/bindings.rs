@@ -52,7 +52,7 @@ impl OSSL_DISPATCH {
         function: None,
     };
 
-    pub fn new(fnid: c_int, fnpt: GenericNullableFnPtr) -> Self {
+    pub const fn new(fnid: c_int, fnpt: GenericNullableFnPtr) -> Self {
         Self {
             function_id: fnid,
             function: fnpt,
@@ -74,8 +74,9 @@ macro_rules! dispatch_table_entry {
         // prevents the code it's used in from compiling at all if it's called with an argument _f
         // that is not of type F.
         // Defining it inside the macro prevents it from being visible as an export of this module.
-        fn check_dispatch_table_entry_type<F>(_f: F) {}
-        check_dispatch_table_entry_type::<$f_type>(Some($f_name));
+        //const fn check_dispatch_table_entry_type<F>(_f: F) {}
+        //check_dispatch_table_entry_type::<$f_type>(Some($f_name));
+        let _: Option<$f_type> = None;
         OSSL_DISPATCH::new(
             // Why we need to cast the function ID: bindgen has to guess
             // at the type for `#define`d constants, and it guesses u32,
