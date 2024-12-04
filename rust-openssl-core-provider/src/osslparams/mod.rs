@@ -1,6 +1,9 @@
 use std::ffi::CStr;
 
-use crate::bindings::{OSSL_PARAM_INTEGER, OSSL_PARAM_UNSIGNED_INTEGER, OSSL_PARAM_UTF8_PTR, ossl_param_st};
+use crate::bindings::{
+    ossl_param_st, OSSL_PARAM_INTEGER, OSSL_PARAM_UNSIGNED_INTEGER, OSSL_PARAM_UTF8_PTR,
+    OSSL_PARAM_UTF8_STRING,
+};
 
 pub mod data;
 
@@ -11,12 +14,18 @@ mod tests;
 #[derive(Debug, Clone)]
 pub enum OSSLParam {
     Utf8Ptr(Utf8PtrData),
+    Utf8String(Utf8StringData),
     Int(IntData),
     UInt(UIntData),
 }
 
 #[derive(Debug, Clone)]
 pub struct Utf8PtrData {
+    param: *mut ossl_param_st
+}
+
+#[derive(Debug, Clone)]
+pub struct Utf8StringData {
     param: *mut ossl_param_st
 }
 
@@ -52,6 +61,7 @@ impl OSSLParam {
     pub fn get_c_struct(&self) -> *mut ossl_param_st {
         match self {
             OSSLParam::Utf8Ptr(d) => d.param,
+            OSSLParam::Utf8String(d) => d.param,
             OSSLParam::Int(d) => d.param,
             OSSLParam::UInt(d) => d.param,
         }
@@ -76,6 +86,7 @@ impl OSSLParam {
     fn inner_data(&self) -> &dyn OSSLParamData {
         match self {
             OSSLParam::Utf8Ptr(d) => d,
+            OSSLParam::Utf8String(d) => d,
             OSSLParam::Int(d) => d,
             OSSLParam::UInt(d) => d,
         }
@@ -154,6 +165,9 @@ impl TryFrom<*mut ossl_param_st> for OSSLParam {
             Some(p) => match p.data_type {
                 OSSL_PARAM_UTF8_PTR => {
                     Ok(OSSLParam::Utf8Ptr(Utf8PtrData::try_from(p as *mut ossl_param_st).unwrap()))
+                },
+                OSSL_PARAM_UTF8_STRING => {
+                    Ok(OSSLParam::Utf8String(Utf8StringData::try_from(p as *mut ossl_param_st).unwrap()))
                 },
                 OSSL_PARAM_INTEGER => {
                     Ok(OSSLParam::Int(IntData::try_from(p as *mut ossl_param_st).unwrap()))
