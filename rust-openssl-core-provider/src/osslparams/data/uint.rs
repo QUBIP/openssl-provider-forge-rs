@@ -44,6 +44,10 @@ impl OSSLParamData for UIntData {
  * to have both `impl<T: M>` and `impl<T: N>` for the same `X<T> for Y`.
  */
 
+// TODO: Allow setting with at least i32, if not the full spectrum of signed int primitives. It's
+// way too annoying to have to write e.g. p.set(1 as u32) when setting constants. (All the
+// typechecking for these things happens at runtime, so unfortunately the compiler can't infer the
+// "right" type to use.)
 impl_setter!(u8, UInt);
 impl_setter!(u16, UInt);
 impl_setter!(u32, UInt);

@@ -20,6 +20,8 @@ impl OSSLParamData for IntData {
     }
 }
 
+// TODO: Allow setting with at least u32, if not the full spectrum of unsigned int primitives, for
+// symmetry with the fact that we will allow that for UIntData param type (see TODO in uint.rs).
 impl_setter!(i8, Int);
 impl_setter!(i16, Int);
 impl_setter!(i32, Int);
