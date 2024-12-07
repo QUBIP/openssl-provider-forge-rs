@@ -73,7 +73,7 @@ impl OSSLParamGetter<u64> for OSSLParam {
 impl<T: PrimUIntMarker> TypedOSSLParamData<T> for UIntData {
     // https://github.com/openssl/openssl/blob/7f62adaf2b088de38ad2e534d0bfae2ff7ae01f2/crypto/params.c#L937-L951
     fn set(&mut self, value: T) -> Result<(), OSSLParamError> {
-        let mut p = unsafe { *self.param };
+        let p = unsafe { &mut *self.param };
         p.return_size = size_of::<u64>();
         if p.data.is_null() {
             Ok(())
