@@ -20,6 +20,7 @@ impl OSSLParamData for Utf8StringData {
         let bufsize = 1024;
         let buf = Box::into_raw(vec![0u8; bufsize].into_boxed_slice());
         unsafe { (*param_data.param).data = buf as *mut std::ffi::c_void; }
+        unsafe { (*param_data.param).data_size = bufsize; }
         param_data
     }
 }

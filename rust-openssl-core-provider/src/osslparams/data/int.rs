@@ -12,7 +12,11 @@ impl PrimIntMarker for i64 {}
 
 impl OSSLParamData for IntData {
     fn new_null(key: &KeyType) -> Self {
-        new_null_param!(IntData, OSSL_PARAM_INTEGER, key)
+        let param_data = new_null_param!(IntData, OSSL_PARAM_INTEGER, key);
+        let buf = Box::into_raw(Box::new(0i64));
+        unsafe { (*param_data.param).data = buf as *mut std::ffi::c_void; }
+        unsafe { (*param_data.param).data_size = size_of::<i64>(); }
+        param_data
     }
 }
 

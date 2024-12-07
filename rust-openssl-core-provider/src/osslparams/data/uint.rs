@@ -10,7 +10,11 @@ impl PrimUIntMarker for u64 {}
 
 impl OSSLParamData for UIntData {
     fn new_null(key: &KeyType) -> Self where Self: Sized {
-        new_null_param!(UIntData, OSSL_PARAM_UNSIGNED_INTEGER, key)
+        let param_data = new_null_param!(UIntData, OSSL_PARAM_UNSIGNED_INTEGER, key);
+        let buf = Box::into_raw(Box::new(0u64));
+        unsafe { (*param_data.param).data = buf as *mut std::ffi::c_void; }
+        unsafe { (*param_data.param).data_size = size_of::<u64>(); }
+        param_data
     }
 }
 
