@@ -190,6 +190,8 @@ pub const OSSL_PARAM_END: ossl_param_st = ossl_param_st {
     return_size: 0,
 };
 
+pub const EMPTY_PARAMS: [ossl_param_st; 1] = [OSSL_PARAM_END];
+
 /*
  * core::ffi:c_size_t is only in nightly, and unstable
  *
