@@ -143,12 +143,12 @@ pub(crate) use new_null_param;
 
 macro_rules! impl_setter {
     ($t:ty, $variant:ident) => {
-        impl crate::osslparams::OSSLParamSetter<$t> for OSSLParam {
+        impl $crate::osslparams::OSSLParamSetter<$t> for OSSLParam {
             fn set_inner(&mut self, value: $t) -> Result<(), OSSLParamError> {
                 if let OSSLParam::$variant(d) = self {
                     d.set(value)
                 } else {
-                    Err(setter_type_err_string!(self, value))
+                    Err($crate::osslparams::setter_type_err_string!(self, value))
                 }
             }
         }

@@ -1,5 +1,5 @@
 use crate::bindings::{ossl_param_st, OSSL_PARAM_UNSIGNED_INTEGER};
-use crate::osslparams::{impl_setter, new_null_param, setter_type_err_string, KeyType, OSSLParam, OSSLParamData, OSSLParamError, OSSLParamGetter, TypedOSSLParamData, UIntData};
+use crate::osslparams::{impl_setter, new_null_param, KeyType, OSSLParam, OSSLParamData, OSSLParamError, OSSLParamGetter, TypedOSSLParamData, UIntData};
 
 trait PrimUIntMarker: num_traits::PrimInt {}
 

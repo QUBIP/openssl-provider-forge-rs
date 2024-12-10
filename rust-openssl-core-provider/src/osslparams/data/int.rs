@@ -1,7 +1,7 @@
 use num_traits::ToPrimitive;
 
 use crate::bindings::{ossl_param_st, OSSL_PARAM_INTEGER};
-use crate::osslparams::{impl_setter, new_null_param, setter_type_err_string, IntData, KeyType, OSSLParam, OSSLParamData, OSSLParamError, OSSLParamGetter, TypedOSSLParamData};
+use crate::osslparams::{impl_setter, new_null_param, IntData, KeyType, OSSLParam, OSSLParamData, OSSLParamError, OSSLParamGetter, TypedOSSLParamData};
 
 trait PrimIntMarker: num_traits::PrimInt {}
 
