@@ -1,8 +1,8 @@
 use std::ffi::CStr;
 
 use crate::bindings::{
-    ossl_param_st, OSSL_PARAM_INTEGER, OSSL_PARAM_UNSIGNED_INTEGER, OSSL_PARAM_UTF8_PTR,
-    OSSL_PARAM_UTF8_STRING,
+    ossl_param_st, OSSL_PARAM_INTEGER, OSSL_PARAM_OCTET_STRING, OSSL_PARAM_UNSIGNED_INTEGER,
+    OSSL_PARAM_UTF8_PTR, OSSL_PARAM_UTF8_STRING,
 };
 
 pub mod data;
@@ -17,6 +17,7 @@ pub enum OSSLParam {
     Utf8String(Utf8StringData),
     Int(IntData),
     UInt(UIntData),
+    OctetString(OctetStringData),
 }
 
 #[derive(Debug, Clone)]
@@ -36,6 +37,11 @@ pub struct IntData {
 
 #[derive(Debug, Clone)]
 pub struct UIntData {
+    param: *mut ossl_param_st
+}
+
+#[derive(Debug, Clone)]
+pub struct OctetStringData {
     param: *mut ossl_param_st
 }
 
@@ -64,6 +70,7 @@ impl OSSLParam {
             OSSLParam::Utf8String(d) => d.param,
             OSSLParam::Int(d) => d.param,
             OSSLParam::UInt(d) => d.param,
+            OSSLParam::OctetString(d) => d.param,
         }
     }
 
@@ -89,6 +96,7 @@ impl OSSLParam {
             OSSLParam::Utf8String(d) => d,
             OSSLParam::Int(d) => d,
             OSSLParam::UInt(d) => d,
+            OSSLParam::OctetString(d) => d,
         }
     }
 
@@ -174,6 +182,9 @@ impl TryFrom<*mut ossl_param_st> for OSSLParam {
                 },
                 OSSL_PARAM_UNSIGNED_INTEGER => {
                     Ok(OSSLParam::UInt(UIntData::try_from(p as *mut ossl_param_st).unwrap()))
+                },
+                OSSL_PARAM_OCTET_STRING => {
+                    Ok(OSSLParam::OctetString(OctetStringData::try_from(p as *mut ossl_param_st).unwrap()))
                 },
                 _ => Err("Couldn't convert to OSSLParam from *mut ossl_param_st".to_string())
             },
