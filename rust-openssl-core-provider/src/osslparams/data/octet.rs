@@ -51,21 +51,17 @@ impl<'a> TypedOSSLParamData<&'a [u8]> for OctetStringData {
         let len = value.len();
         p.return_size = len;
         if p.data.is_null() {
-            p.return_size = 0;
-        } else {
-            // Set the inner contents of the param
-            if p.data.is_null() {
-                // https://github.com/openssl/openssl/blob/85f17585b0d8b55b335f561e2862db14a20b1e64/crypto/params.c#L1398
-                // ?????
-                return Ok(());
-            }
-            if p.data_size < len {
-                return Err("p.data_size in param is too small to fit the octet string".to_string());
-            }
-            unsafe {
-                std::ptr::copy(value.as_ptr(), p.data as *mut u8, len);
-            };
+            // https://github.com/openssl/openssl/blob/85f17585b0d8b55b335f561e2862db14a20b1e64/crypto/params.c#L1398
+            // ?????
+            return Ok(());
         }
+        if p.data_size < len {
+            return Err("p.data_size in param is too small to fit the octet string".to_string());
+        }
+        // Set the inner contents of the param
+        unsafe {
+            std::ptr::copy(value.as_ptr(), p.data as *mut u8, len);
+        };
         Ok(())
     }
 }
