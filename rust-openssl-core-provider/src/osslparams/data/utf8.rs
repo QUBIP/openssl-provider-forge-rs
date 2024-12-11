@@ -91,33 +91,29 @@ impl TypedOSSLParamData<*const CStr> for Utf8StringData {
             return Err("self.param was null".to_string());
         }
         let p = unsafe { &mut *self.param };
-        if p.data.is_null() {
-            p.return_size = 0;
-        } else {
-            if value.is_null() {
-                return Err("value was null".to_string());
-            }
-            // Set the inner contents of the param
-            match unsafe { value.as_ref() } {
-                Some(cstr) => {
-                    let len = cstr.to_bytes().len();
-                    p.return_size = len;
-                    if p.data.is_null() {
-                        // https://github.com/openssl/openssl/blob/85f17585b0d8b55b335f561e2862db14a20b1e64/crypto/params.c#L1398
-                        // ?????
-                        return Ok(());
-                    }
+        p.return_size = 0;
+        if value.is_null() {
+            return Err("value was null".to_string());
+        }
+        // Set the inner contents of the param
+        match unsafe { value.as_ref() } {
+            Some(cstr) => {
+                let len = cstr.to_bytes().len();
+                p.return_size = len;
+                if !p.data.is_null() {
                     if p.data_size < len {
                         return Err("p.data_size in param is too small to fit the string".to_string());
                     }
                     unsafe {
-                        std::ptr::copy(cstr.as_ptr(), p.data as *mut c_char, len);
+                        // copy the string, with the terminating null byte if there's room for it
+                        let total_len = if p.data_size > len { len + 1 } else { len };
+                        std::ptr::copy(cstr.as_ptr(), p.data as *mut c_char, total_len);
                     };
-                },
-                None => return Err("couldn't get &CStr from *const CStr".to_string()),
-            }
+                }
+                Ok(())
+            },
+            None => Err("couldn't get &CStr from *const CStr".to_string()),
         }
-        Ok(())
     }
 }
 
