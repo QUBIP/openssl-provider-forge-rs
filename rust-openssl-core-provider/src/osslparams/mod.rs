@@ -64,24 +64,6 @@ impl OSSLParam {
         self.get_inner()
     }
 
-    pub fn try_new_vec(pointer: *mut ossl_param_st) -> Result<Vec<Self>, String> {
-        let mut v: Vec<OSSLParam> = Vec::new();
-        let mut i = 0;
-        loop {
-            let p = unsafe { &mut *pointer.offset(i) };
-            if p.key.is_null() {
-                break;
-            } else {
-                match OSSLParam::try_from(&mut *p) {
-                    Ok(param) => v.push(param),
-                    Err(_) => eprintln!("Unimplemented param data type: {:?}", p.data_type),
-                }
-            }
-            i += 1;
-        }
-        Ok(v)
-    }
-
     pub fn get_c_struct(&self) -> *mut ossl_param_st {
         match self {
             OSSLParam::Utf8Ptr(d) => d.param,
@@ -262,5 +244,27 @@ pub fn ossl_param_locate_raw(params: *mut ossl_param_st, key: &KeyType) -> Optio
             }
         }
         i += 1;
+    }
+}
+
+impl From<&mut ossl_param_st> for Vec<OSSLParam> {
+    fn from(params: &mut ossl_param_st) -> Self {
+        let mut v: Vec<OSSLParam> = Vec::new();
+        let mut i = 0;
+        loop {
+            let p = unsafe { &mut *(params as *mut ossl_param_st).offset(i) };
+            if p.key.is_null() {
+                break;
+            } else {
+                match OSSLParam::try_from(&mut *p) {
+                    Ok(param) => v.push(param),
+                    Err(_) => {
+                        eprintln!("Unimplemented param data type: {:?}", p.data_type);
+                    },
+                }
+            }
+            i += 1;
+        }
+        v
     }
 }
