@@ -245,3 +245,22 @@ pub fn ossl_param_locate<'a>(params: &'a mut [OSSLParam], key: &KeyType) -> Opti
         p.get_key() == key
     })
 }
+
+pub fn ossl_param_locate_raw(params: *mut ossl_param_st, key: &KeyType) -> Option<OSSLParam> {
+    let mut i = 0;
+    loop {
+        let p = unsafe { &mut *params.offset(i) };
+        if p.key.is_null() {
+            return None;
+        } else if unsafe { CStr::from_ptr(p.key) } == key  {
+            match OSSLParam::try_from(&mut *p) {
+                Ok(param) => return Some(param),
+                Err(_) => {
+                    eprintln!("Unimplemented param data type: {:?}", p.data_type);
+                    return None;
+                },
+            }
+        }
+        i += 1;
+    }
+}
