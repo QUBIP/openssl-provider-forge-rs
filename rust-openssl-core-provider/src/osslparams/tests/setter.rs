@@ -37,7 +37,6 @@ fn test_uint_data_() {
     let result = uint_data.set(value);
 
     assert_eq!(result, Ok(()));
-    
 }
 
 // In the above 2 tests, we declared a mut variables 'int_data' and 'uint_data' of type IntData & UIntData respectively.
@@ -67,7 +66,7 @@ fn test_utf8_ptr_data_set() {
 
     // Set the value using the set method
     let result = utf8_data.set(value);
-    
+
     assert_eq!(result, Ok(()));
 
     // Check that ossl_param.data now points to the address of `value`
@@ -89,4 +88,3 @@ fn test_utf8_ptr_data_set() {
         "Incorrect return_size"
     );
 }
-

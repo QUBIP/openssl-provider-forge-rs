@@ -4,7 +4,7 @@ use super::*;
 
 #[test]
 fn test_utf8_ptr_data_new_null() {
-    let key =c"test_key";
+    let key = c"test_key";
     let utf8_data = Utf8PtrData::new_null(&key);
     assert!(
         utf8_data.param.is_null() == false,

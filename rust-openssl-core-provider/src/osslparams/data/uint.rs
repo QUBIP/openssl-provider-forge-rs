@@ -1,5 +1,8 @@
 use crate::bindings::{ossl_param_st, OSSL_PARAM_UNSIGNED_INTEGER};
-use crate::osslparams::{impl_setter, new_null_param, KeyType, OSSLParam, OSSLParamData, OSSLParamError, OSSLParamGetter, TypedOSSLParamData, UIntData};
+use crate::osslparams::{
+    impl_setter, new_null_param, KeyType, OSSLParam, OSSLParamData, OSSLParamError,
+    OSSLParamGetter, TypedOSSLParamData, UIntData,
+};
 
 trait PrimUIntMarker: num_traits::PrimInt {}
 
@@ -9,11 +12,18 @@ impl PrimUIntMarker for u32 {}
 impl PrimUIntMarker for u64 {}
 
 impl OSSLParamData for UIntData {
-    fn new_null(key: &KeyType) -> Self where Self: Sized {
+    fn new_null(key: &KeyType) -> Self
+    where
+        Self: Sized,
+    {
         let param_data = new_null_param!(UIntData, OSSL_PARAM_UNSIGNED_INTEGER, key);
         let buf = Box::into_raw(Box::new(0u64));
-        unsafe { (*param_data.param).data = buf as *mut std::ffi::c_void; }
-        unsafe { (*param_data.param).data_size = size_of::<u64>(); }
+        unsafe {
+            (*param_data.param).data = buf as *mut std::ffi::c_void;
+        }
+        unsafe {
+            (*param_data.param).data_size = size_of::<u64>();
+        }
         param_data
     }
 }
@@ -59,12 +69,8 @@ impl OSSLParamGetter<u64> for OSSLParam {
             unsafe {
                 let data = (*d.param).data;
                 match (*d.param).data_size {
-                    s if s == size_of::<u32>() => {
-                        Some(std::ptr::read(data as *const u32) as u64)
-                    },
-                    s if s == size_of::<u64>() => {
-                        Some(std::ptr::read(data as *const u64))
-                    },
+                    s if s == size_of::<u32>() => Some(std::ptr::read(data as *const u32) as u64),
+                    s if s == size_of::<u64>() => Some(std::ptr::read(data as *const u64)),
                     _ => None,
                 }
             }
@@ -95,7 +101,7 @@ impl<T: PrimUIntMarker> TypedOSSLParamData<T> for UIntData {
                     } else {
                         Err("value could not be converted to u32".to_string())
                     }
-                },
+                }
                 s if s == size_of::<u64>() => {
                     if let Some(x) = value.to_u64() {
                         unsafe { std::ptr::write(p.data as *mut u64, x) };
@@ -103,7 +109,7 @@ impl<T: PrimUIntMarker> TypedOSSLParamData<T> for UIntData {
                     } else {
                         Err("value could not be converted to u64".to_string())
                     }
-                },
+                }
                 _ => Err("param.data_size was neither the size of u32 nor of u64".to_string()),
             }
         }
@@ -115,12 +121,13 @@ impl TryFrom<*mut ossl_param_st> for UIntData {
 
     fn try_from(param: *mut ossl_param_st) -> Result<Self, Self::Error> {
         match unsafe { param.as_mut() } {
-            Some(param) =>
+            Some(param) => {
                 if param.data_type != OSSL_PARAM_UNSIGNED_INTEGER {
                     Err("tried to make UIntData from ossl_param_st with data_type != OSSL_PARAM_UNSIGNED_INTEGER")
                 } else {
                     Ok(UIntData { param })
-                },
+                }
+            }
             None => Err("tried to make UIntData from null pointer"),
         }
     }

@@ -1,7 +1,10 @@
 use num_traits::ToPrimitive;
 
 use crate::bindings::{ossl_param_st, OSSL_PARAM_INTEGER};
-use crate::osslparams::{impl_setter, new_null_param, IntData, KeyType, OSSLParam, OSSLParamData, OSSLParamError, OSSLParamGetter, TypedOSSLParamData};
+use crate::osslparams::{
+    impl_setter, new_null_param, IntData, KeyType, OSSLParam, OSSLParamData, OSSLParamError,
+    OSSLParamGetter, TypedOSSLParamData,
+};
 
 trait PrimIntMarker: num_traits::PrimInt {}
 
@@ -14,8 +17,12 @@ impl OSSLParamData for IntData {
     fn new_null(key: &KeyType) -> Self {
         let param_data = new_null_param!(IntData, OSSL_PARAM_INTEGER, key);
         let buf = Box::into_raw(Box::new(0i64));
-        unsafe { (*param_data.param).data = buf as *mut std::ffi::c_void; }
-        unsafe { (*param_data.param).data_size = size_of::<i64>(); }
+        unsafe {
+            (*param_data.param).data = buf as *mut std::ffi::c_void;
+        }
+        unsafe {
+            (*param_data.param).data_size = size_of::<i64>();
+        }
         param_data
     }
 }
@@ -40,13 +47,13 @@ impl OSSLParamGetter<i32> for OSSLParam {
                     let val = unsafe { std::ptr::read(data as *const i32) };
                     // here we can check stuff about val
                     Some(val)
-                },
+                }
                 s if s == size_of::<i64>() => {
                     // we can have debug assertions for the pointer we're giving to read()
                     // being non-null, being properly aligned, any other stuff we can check at
                     // runtime (although "validity" is probably too nebulous)
                     unsafe { std::ptr::read(data as *const i64).to_i32() }
-                },
+                }
                 _ => None,
             }
         } else {
@@ -66,12 +73,8 @@ impl OSSLParamGetter<i64> for OSSLParam {
             unsafe {
                 let data = (*d.param).data;
                 match (*d.param).data_size {
-                    s if s == size_of::<i32>() => {
-                        Some(std::ptr::read(data as *const i32) as i64)
-                    },
-                    s if s == size_of::<i64>() => {
-                        Some(std::ptr::read(data as *const i64))
-                    },
+                    s if s == size_of::<i32>() => Some(std::ptr::read(data as *const i32) as i64),
+                    s if s == size_of::<i64>() => Some(std::ptr::read(data as *const i64)),
                     _ => None,
                 }
             }
@@ -98,7 +101,7 @@ impl<T: PrimIntMarker> TypedOSSLParamData<T> for IntData {
                     } else {
                         Err("value could not be converted to i32".to_string())
                     }
-                },
+                }
                 s if s == size_of::<i64>() => {
                     if let Some(x) = value.to_i64() {
                         unsafe { std::ptr::write(p.data as *mut i64, x) };
@@ -106,7 +109,7 @@ impl<T: PrimIntMarker> TypedOSSLParamData<T> for IntData {
                     } else {
                         Err("value could not be converted to i64".to_string())
                     }
-                },
+                }
                 _ => Err("param.data_size was neither the size of i32 nor of i64".to_string()),
             }
         }
@@ -118,12 +121,13 @@ impl TryFrom<*mut ossl_param_st> for IntData {
 
     fn try_from(param: *mut ossl_param_st) -> Result<Self, Self::Error> {
         match unsafe { param.as_mut() } {
-            Some(param) =>
+            Some(param) => {
                 if param.data_type != OSSL_PARAM_INTEGER {
                     Err("tried to make IntData from ossl_param_st with data_type != OSSL_PARAM_INTEGER")
                 } else {
                     Ok(IntData { param })
-                },
+                }
+            }
             None => Err("tried to make IntData from null pointer"),
         }
     }

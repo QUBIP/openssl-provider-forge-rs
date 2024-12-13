@@ -22,27 +22,27 @@ pub enum OSSLParam {
 
 #[derive(Debug, Clone)]
 pub struct Utf8PtrData {
-    param: *mut ossl_param_st
+    param: *mut ossl_param_st,
 }
 
 #[derive(Debug, Clone)]
 pub struct Utf8StringData {
-    param: *mut ossl_param_st
+    param: *mut ossl_param_st,
 }
 
 #[derive(Debug, Clone)]
 pub struct IntData {
-    param: *mut ossl_param_st
+    param: *mut ossl_param_st,
 }
 
 #[derive(Debug, Clone)]
 pub struct UIntData {
-    param: *mut ossl_param_st
+    param: *mut ossl_param_st,
 }
 
 #[derive(Debug, Clone)]
 pub struct OctetStringData {
-    param: *mut ossl_param_st
+    param: *mut ossl_param_st,
 }
 
 pub type OSSLParamError = String;
@@ -75,17 +75,13 @@ impl OSSLParam {
     }
 
     pub fn get_key(&self) -> &KeyType {
-        unsafe {
-            CStr::from_ptr((*self.get_c_struct()).key)
-        }
+        unsafe { CStr::from_ptr((*self.get_c_struct()).key) }
     }
 
     // corresponds to OSSL_PARAM_modified()
     #[allow(dead_code)]
     pub fn modified(&self) -> bool {
-        unsafe {
-            (*self.get_c_struct()).return_size != OSSL_PARAM_UNMODIFIED
-        }
+        unsafe { (*self.get_c_struct()).return_size != OSSL_PARAM_UNMODIFIED }
     }
 
     // right now this method is just here to show we can return &dyn OSSLParamData if we need it
@@ -116,7 +112,9 @@ pub trait OSSLParamGetter<T> {
 }
 
 pub trait OSSLParamData {
-    fn new_null(key: &KeyType) -> Self where Self: Sized;
+    fn new_null(key: &KeyType) -> Self
+    where
+        Self: Sized;
 }
 
 pub trait TypedOSSLParamData<T>: OSSLParamData {
@@ -125,10 +123,12 @@ pub trait TypedOSSLParamData<T>: OSSLParamData {
 
 macro_rules! setter_type_err_string {
     ($param:expr, $value:ident) => {
-        format!("Type {} could not be stored in OSSLParam::{}",
+        format!(
+            "Type {} could not be stored in OSSLParam::{}",
             std::any::type_name_of_val(&$value),
-            $param.variant_name())
-    }
+            $param.variant_name()
+        )
+    };
 }
 
 pub(crate) use setter_type_err_string;
@@ -142,9 +142,9 @@ macro_rules! new_null_param {
                 data: std::ptr::null::<std::ffi::c_void>() as *mut std::ffi::c_void,
                 data_size: 0,
                 return_size: 0,
-            }))
+            })),
         }
-    }
+    };
 }
 
 pub(crate) use new_null_param;
@@ -160,7 +160,7 @@ macro_rules! impl_setter {
                 }
             }
         }
-    }
+    };
 }
 
 pub(crate) use impl_setter;
@@ -179,22 +179,22 @@ impl TryFrom<*mut ossl_param_st> for OSSLParam {
     fn try_from(p: *mut ossl_param_st) -> std::result::Result<Self, Self::Error> {
         match unsafe { p.as_mut() } {
             Some(p) => match p.data_type {
-                OSSL_PARAM_UTF8_PTR => {
-                    Ok(OSSLParam::Utf8Ptr(Utf8PtrData::try_from(p as *mut ossl_param_st).unwrap()))
-                },
-                OSSL_PARAM_UTF8_STRING => {
-                    Ok(OSSLParam::Utf8String(Utf8StringData::try_from(p as *mut ossl_param_st).unwrap()))
-                },
-                OSSL_PARAM_INTEGER => {
-                    Ok(OSSLParam::Int(IntData::try_from(p as *mut ossl_param_st).unwrap()))
-                },
-                OSSL_PARAM_UNSIGNED_INTEGER => {
-                    Ok(OSSLParam::UInt(UIntData::try_from(p as *mut ossl_param_st).unwrap()))
-                },
-                OSSL_PARAM_OCTET_STRING => {
-                    Ok(OSSLParam::OctetString(OctetStringData::try_from(p as *mut ossl_param_st).unwrap()))
-                },
-                _ => Err("Couldn't convert to OSSLParam from *mut ossl_param_st".to_string())
+                OSSL_PARAM_UTF8_PTR => Ok(OSSLParam::Utf8Ptr(
+                    Utf8PtrData::try_from(p as *mut ossl_param_st).unwrap(),
+                )),
+                OSSL_PARAM_UTF8_STRING => Ok(OSSLParam::Utf8String(
+                    Utf8StringData::try_from(p as *mut ossl_param_st).unwrap(),
+                )),
+                OSSL_PARAM_INTEGER => Ok(OSSLParam::Int(
+                    IntData::try_from(p as *mut ossl_param_st).unwrap(),
+                )),
+                OSSL_PARAM_UNSIGNED_INTEGER => Ok(OSSLParam::UInt(
+                    UIntData::try_from(p as *mut ossl_param_st).unwrap(),
+                )),
+                OSSL_PARAM_OCTET_STRING => Ok(OSSLParam::OctetString(
+                    OctetStringData::try_from(p as *mut ossl_param_st).unwrap(),
+                )),
+                _ => Err("Couldn't convert to OSSLParam from *mut ossl_param_st".to_string()),
             },
             None => Err("Couldn't convert to OSSLParam from null pointer".to_string()),
         }
@@ -222,10 +222,11 @@ pub const EMPTY_PARAMS: [ossl_param_st; 1] = [OSSL_PARAM_END];
 // const OSSL_PARAM_UNMODIFIED: usize = core::ffi::c_size_t::MAX;
 const OSSL_PARAM_UNMODIFIED: usize = usize::MAX;
 
-pub fn ossl_param_locate<'a>(params: &'a mut [OSSLParam], key: &KeyType) -> Option<&'a mut OSSLParam> {
-    params.iter_mut().find(|p| {
-        p.get_key() == key
-    })
+pub fn ossl_param_locate<'a>(
+    params: &'a mut [OSSLParam],
+    key: &KeyType,
+) -> Option<&'a mut OSSLParam> {
+    params.iter_mut().find(|p| p.get_key() == key)
 }
 
 pub fn ossl_param_locate_raw(params: *mut ossl_param_st, key: &KeyType) -> Option<OSSLParam> {
@@ -234,13 +235,13 @@ pub fn ossl_param_locate_raw(params: *mut ossl_param_st, key: &KeyType) -> Optio
         let p = unsafe { &mut *params.offset(i) };
         if p.key.is_null() {
             return None;
-        } else if unsafe { CStr::from_ptr(p.key) } == key  {
+        } else if unsafe { CStr::from_ptr(p.key) } == key {
             match OSSLParam::try_from(&mut *p) {
                 Ok(param) => return Some(param),
                 Err(_) => {
                     eprintln!("Unimplemented param data type: {:?}", p.data_type);
                     return None;
-                },
+                }
             }
         }
         i += 1;
@@ -260,7 +261,7 @@ impl From<&mut ossl_param_st> for Vec<OSSLParam> {
                     Ok(param) => v.push(param),
                     Err(_) => {
                         eprintln!("Unimplemented param data type: {:?}", p.data_type);
-                    },
+                    }
                 }
             }
             i += 1;

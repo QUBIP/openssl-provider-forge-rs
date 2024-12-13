@@ -1,7 +1,6 @@
 use super::*;
 use std::ptr;
 
-
 // Tests for the TryFrom implementations
 
 #[test]

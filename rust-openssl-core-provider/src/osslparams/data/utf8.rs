@@ -7,7 +7,10 @@ use crate::osslparams::{
 };
 
 impl OSSLParamData for Utf8PtrData {
-    fn new_null(key: &KeyType) -> Self where Self: Sized {
+    fn new_null(key: &KeyType) -> Self
+    where
+        Self: Sized,
+    {
         new_null_param!(Utf8PtrData, OSSL_PARAM_UTF8_PTR, key)
     }
 }
@@ -15,12 +18,19 @@ impl OSSLParamData for Utf8PtrData {
 // TODO: don't leak the buffer
 // TODO, maybe: let the user specify how big the buffer should be
 impl OSSLParamData for Utf8StringData {
-    fn new_null(key: &KeyType) -> Self where Self: Sized {
+    fn new_null(key: &KeyType) -> Self
+    where
+        Self: Sized,
+    {
         let param_data = new_null_param!(Utf8StringData, OSSL_PARAM_UTF8_STRING, key);
         let bufsize = 1024;
         let buf = Box::into_raw(vec![0u8; bufsize].into_boxed_slice());
-        unsafe { (*param_data.param).data = buf as *mut std::ffi::c_void; }
-        unsafe { (*param_data.param).data_size = bufsize; }
+        unsafe {
+            (*param_data.param).data = buf as *mut std::ffi::c_void;
+        }
+        unsafe {
+            (*param_data.param).data_size = bufsize;
+        }
         param_data
     }
 }
@@ -77,7 +87,7 @@ impl TypedOSSLParamData<*const CStr> for Utf8PtrData {
                 Some(cstr) => {
                     p.return_size = cstr.to_bytes().len();
                     unsafe { *(p.data as *mut *const c_char) = cstr.as_ptr() };
-                },
+                }
                 None => return Err("couldn't get &CStr from *const CStr".to_string()),
             }
         }
@@ -102,7 +112,9 @@ impl TypedOSSLParamData<*const CStr> for Utf8StringData {
                 p.return_size = len;
                 if !p.data.is_null() {
                     if p.data_size < len {
-                        return Err("p.data_size in param is too small to fit the string".to_string());
+                        return Err(
+                            "p.data_size in param is too small to fit the string".to_string()
+                        );
                     }
                     unsafe {
                         // copy the string, with the terminating null byte if there's room for it
@@ -111,7 +123,7 @@ impl TypedOSSLParamData<*const CStr> for Utf8StringData {
                     };
                 }
                 Ok(())
-            },
+            }
             None => Err("couldn't get &CStr from *const CStr".to_string()),
         }
     }
@@ -128,12 +140,13 @@ impl TryFrom<*mut ossl_param_st> for Utf8PtrData {
 
     fn try_from(param: *mut ossl_param_st) -> Result<Self, Self::Error> {
         match unsafe { param.as_mut() } {
-            Some(param) =>
+            Some(param) => {
                 if param.data_type != OSSL_PARAM_UTF8_PTR {
                     Err("tried to make Utf8PtrData from ossl_param_st with data_type != OSSL_PARAM_UTF8_PTR".to_string())
                 } else {
                     Ok(Utf8PtrData { param })
-                },
+                }
+            }
             None => Err("tried to make Utf8PtrData from null pointer".to_string()),
         }
     }
@@ -144,12 +157,13 @@ impl TryFrom<*mut ossl_param_st> for Utf8StringData {
 
     fn try_from(param: *mut ossl_param_st) -> Result<Self, Self::Error> {
         match unsafe { param.as_mut() } {
-            Some(param) =>
+            Some(param) => {
                 if param.data_type != OSSL_PARAM_UTF8_STRING {
                     Err("tried to make Utf8StringData from ossl_param_st with data_type != OSSL_PARAM_UTF8_STRING".to_string())
                 } else {
                     Ok(Utf8StringData { param })
-                },
+                }
+            }
             None => Err("tried to make Utf8StringData from null pointer".to_string()),
         }
     }

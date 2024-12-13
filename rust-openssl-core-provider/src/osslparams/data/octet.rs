@@ -9,12 +9,19 @@ use crate::osslparams::{
 // TODO: don't leak the buffer
 // TODO, maybe: let the user specify how big the buffer should be
 impl OSSLParamData for OctetStringData {
-    fn new_null(key: &KeyType) -> Self where Self: Sized {
+    fn new_null(key: &KeyType) -> Self
+    where
+        Self: Sized,
+    {
         let param_data = new_null_param!(OctetStringData, OSSL_PARAM_OCTET_STRING, key);
         let bufsize = 1024;
         let buf = Box::into_raw(vec![0u8; bufsize].into_boxed_slice());
-        unsafe { (*param_data.param).data = buf as *mut std::ffi::c_void; }
-        unsafe { (*param_data.param).data_size = bufsize; }
+        unsafe {
+            (*param_data.param).data = buf as *mut std::ffi::c_void;
+        }
+        unsafe {
+            (*param_data.param).data_size = bufsize;
+        }
         param_data
     }
 }
@@ -71,12 +78,13 @@ impl TryFrom<*mut ossl_param_st> for OctetStringData {
 
     fn try_from(param: *mut ossl_param_st) -> Result<Self, Self::Error> {
         match unsafe { param.as_mut() } {
-            Some(param) =>
+            Some(param) => {
                 if param.data_type != OSSL_PARAM_OCTET_STRING {
                     Err("tried to make OctetStringData from ossl_param_st with data_type != OSSL_PARAM_OCTET_STRING".to_string())
                 } else {
                     Ok(OctetStringData { param })
-                },
+                }
+            }
             None => Err("tried to make OctetStringData from null pointer".to_string()),
         }
     }
