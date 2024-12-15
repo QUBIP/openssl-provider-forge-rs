@@ -11,6 +11,8 @@ pretty_env_logger = ["dep:pretty_env_logger"]
 
 
 [dependencies]
+anyhow = "1.0.94"
+bitflags = "2.6.0"
 function_name = "0.3"
 libc = "0.2"
 log = "0.4"
