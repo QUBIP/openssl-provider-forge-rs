@@ -82,7 +82,7 @@ macro_rules! dispatch_table_entry {
             // at the type for `#define`d constants, and it guesses u32,
             // which conflicts with the type of the `function_id` field.
             $f_id as i32,
-            Some(unsafe { crate::bindings::generic_non_null_fn_ptr!($f_name) }),
+            Some(unsafe { $crate::bindings::generic_non_null_fn_ptr!($f_name) }),
         )
     }};
 }
