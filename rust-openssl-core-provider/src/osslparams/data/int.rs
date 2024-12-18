@@ -118,7 +118,7 @@ impl TryFrom<*mut OSSL_PARAM> for IntData<'_> {
         match unsafe { param.as_mut() } {
             Some(param) => {
                 if param.data_type != OSSL_PARAM_INTEGER {
-                    Err("tried to make IntData from ossl_param_st with data_type != OSSL_PARAM_INTEGER")
+                    Err("tried to make IntData from OSSL_PARAM with data_type != OSSL_PARAM_INTEGER")
                 } else {
                     Ok(IntData { param })
                 }

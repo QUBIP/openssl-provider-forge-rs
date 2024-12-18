@@ -138,7 +138,7 @@ pub(crate) use setter_type_err_string;
 macro_rules! new_null_param {
     ($constructor:ident, $data_type:ident, $key:expr) => {
         $constructor {
-            param: Box::leak(Box::new(crate::bindings::ossl_param_st {
+            param: Box::leak(Box::new(crate::bindings::OSSL_PARAM {
                 key: $key.as_ptr().cast(),
                 data_type: $data_type,
                 data: std::ptr::null::<std::ffi::c_void>() as *mut std::ffi::c_void,
@@ -196,7 +196,7 @@ impl<'a> TryFrom<*mut OSSL_PARAM> for OSSLParam<'a> {
                 OSSL_PARAM_OCTET_STRING => Ok(OSSLParam::OctetString(
                     OctetStringData::try_from(p as *mut OSSL_PARAM).unwrap(),
                 )),
-                _ => Err("Couldn't convert to OSSLParam from *mut ossl_param_st".to_string()),
+                _ => Err("Couldn't convert to OSSLParam from *mut OSSL_PARAM".to_string()),
             },
             None => Err("Couldn't convert to OSSLParam from null pointer".to_string()),
         }

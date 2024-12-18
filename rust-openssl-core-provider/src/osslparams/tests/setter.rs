@@ -56,7 +56,7 @@ fn test_utf8_ptr_data_set() {
     let mut pointer_to_utf8: *const i8 = std::ptr::null();
     ossl_param.data = &mut pointer_to_utf8 as *mut *const i8 as *mut std::ffi::c_void;
 
-    // Create an instance of Utf8PtrData pointing to the dummy ossl_param_st
+    // Create an instance of Utf8PtrData pointing to the dummy OSSL_PARAM
     let mut utf8_data = Utf8PtrData {
         param: &mut ossl_param,
     };

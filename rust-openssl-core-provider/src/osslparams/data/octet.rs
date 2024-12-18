@@ -71,7 +71,7 @@ impl TryFrom<*mut OSSL_PARAM> for OctetStringData<'_> {
         match unsafe { param.as_mut() } {
             Some(param) => {
                 if param.data_type != OSSL_PARAM_OCTET_STRING {
-                    Err("tried to make OctetStringData from ossl_param_st with data_type != OSSL_PARAM_OCTET_STRING".to_string())
+                    Err("tried to make OctetStringData from OSSL_PARAM with data_type != OSSL_PARAM_OCTET_STRING".to_string())
                 } else {
                     Ok(OctetStringData { param })
                 }

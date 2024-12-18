@@ -131,7 +131,7 @@ impl TryFrom<*mut OSSL_PARAM> for Utf8PtrData<'_> {
         match unsafe { param.as_mut() } {
             Some(param) => {
                 if param.data_type != OSSL_PARAM_UTF8_PTR {
-                    Err("tried to make Utf8PtrData from ossl_param_st with data_type != OSSL_PARAM_UTF8_PTR".to_string())
+                    Err("tried to make Utf8PtrData from OSSL_PARAM with data_type != OSSL_PARAM_UTF8_PTR".to_string())
                 } else {
                     Ok(Utf8PtrData { param })
                 }
@@ -148,7 +148,7 @@ impl TryFrom<*mut OSSL_PARAM> for Utf8StringData<'_> {
         match unsafe { param.as_mut() } {
             Some(param) => {
                 if param.data_type != OSSL_PARAM_UTF8_STRING {
-                    Err("tried to make Utf8StringData from ossl_param_st with data_type != OSSL_PARAM_UTF8_STRING".to_string())
+                    Err("tried to make Utf8StringData from OSSL_PARAM with data_type != OSSL_PARAM_UTF8_STRING".to_string())
                 } else {
                     Ok(Utf8StringData { param })
                 }
