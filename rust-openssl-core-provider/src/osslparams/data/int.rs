@@ -13,16 +13,12 @@ impl PrimIntMarker for i16 {}
 impl PrimIntMarker for i32 {}
 impl PrimIntMarker for i64 {}
 
-impl OSSLParamData for IntData {
+impl OSSLParamData for IntData<'_> {
     fn new_null(key: &KeyType) -> Self {
         let param_data = new_null_param!(IntData, OSSL_PARAM_INTEGER, key);
         let buf = Box::into_raw(Box::new(0i64));
-        unsafe {
-            (*param_data.param).data = buf as *mut std::ffi::c_void;
-        }
-        unsafe {
-            (*param_data.param).data_size = size_of::<i64>();
-        }
+        param_data.param.data = buf as *mut std::ffi::c_void;
+        param_data.param.data_size = size_of::<i64>();
         param_data
     }
 }
@@ -34,11 +30,10 @@ impl_setter!(i16, Int);
 impl_setter!(i32, Int);
 impl_setter!(i64, Int);
 
-impl OSSLParamGetter<i32> for OSSLParam {
+impl OSSLParamGetter<i32> for OSSLParam<'_> {
     fn get_inner(&self) -> Option<i32> {
         if let OSSLParam::Int(d) = self {
-            let param = unsafe { *d.param };
-            // ^ should probably check in that unsafe block that d.param isn't null
+            let param = &*d.param;
             let data = param.data;
             let data_size = param.data_size;
             // ^ check that this stuff isn't null etc
@@ -67,16 +62,16 @@ impl OSSLParamGetter<i32> for OSSLParam {
  * a i64 from it and cast it themselves.
  */
 
-impl OSSLParamGetter<i64> for OSSLParam {
+impl OSSLParamGetter<i64> for OSSLParam<'_> {
     fn get_inner(&self) -> Option<i64> {
         if let OSSLParam::Int(d) = self {
-            unsafe {
-                let data = (*d.param).data;
-                match (*d.param).data_size {
-                    s if s == size_of::<i32>() => Some(std::ptr::read(data as *const i32) as i64),
-                    s if s == size_of::<i64>() => Some(std::ptr::read(data as *const i64)),
-                    _ => None,
+            let data = d.param.data;
+            match d.param.data_size {
+                s if s == size_of::<i32>() => {
+                    Some(unsafe { std::ptr::read(data as *const i32) } as i64)
                 }
+                s if s == size_of::<i64>() => Some(unsafe { std::ptr::read(data as *const i64) }),
+                _ => None,
             }
         } else {
             None
@@ -84,10 +79,10 @@ impl OSSLParamGetter<i64> for OSSLParam {
     }
 }
 
-impl<T: PrimIntMarker> TypedOSSLParamData<T> for IntData {
+impl<T: PrimIntMarker> TypedOSSLParamData<T> for IntData<'_> {
     // https://github.com/openssl/openssl/blob/7f62adaf2b088de38ad2e534d0bfae2ff7ae01f2/crypto/params.c#L780-L796
     fn set(&mut self, value: T) -> Result<(), OSSLParamError> {
-        let p = unsafe { &mut *self.param };
+        let p = &mut *self.param;
         p.return_size = size_of::<i64>();
         if p.data.is_null() {
             Ok(())
@@ -116,7 +111,7 @@ impl<T: PrimIntMarker> TypedOSSLParamData<T> for IntData {
     }
 }
 
-impl TryFrom<*mut OSSL_PARAM> for IntData {
+impl TryFrom<*mut OSSL_PARAM> for IntData<'_> {
     type Error = &'static str;
 
     fn try_from(param: *mut OSSL_PARAM) -> Result<Self, Self::Error> {

@@ -8,7 +8,7 @@ use crate::osslparams::{
 
 // TODO: don't leak the buffer
 // TODO, maybe: let the user specify how big the buffer should be
-impl OSSLParamData for OctetStringData {
+impl OSSLParamData for OctetStringData<'_> {
     fn new_null(key: &KeyType) -> Self
     where
         Self: Sized,
@@ -16,12 +16,8 @@ impl OSSLParamData for OctetStringData {
         let param_data = new_null_param!(OctetStringData, OSSL_PARAM_OCTET_STRING, key);
         let bufsize = 1024;
         let buf = Box::into_raw(vec![0u8; bufsize].into_boxed_slice());
-        unsafe {
-            (*param_data.param).data = buf as *mut std::ffi::c_void;
-        }
-        unsafe {
-            (*param_data.param).data_size = bufsize;
-        }
+        param_data.param.data = buf as *mut std::ffi::c_void;
+        param_data.param.data_size = bufsize;
         param_data
     }
 }
@@ -33,13 +29,11 @@ impl_setter!(&[u8], OctetString);
 // corresponding C function takes a buffer as an argument and actually copies the value into it.
 // Taking a buffer as an argument feels very un-Rust-y as an interface design choice, but we may
 // want to copy the bytes into some owned thing and return that instead.
-impl<'a> OSSLParamGetter<&'a [u8]> for OSSLParam {
+impl<'a> OSSLParamGetter<&'a [u8]> for OSSLParam<'_> {
     fn get_inner(&self) -> Option<&'a [u8]> {
         if let OSSLParam::OctetString(d) = self {
-            unsafe {
-                let slice = from_raw_parts((*d.param).data as *const u8, (*d.param).data_size);
-                Some(slice)
-            }
+            let slice = unsafe { from_raw_parts(d.param.data as *const u8, d.param.data_size) };
+            Some(slice)
         } else {
             None
         }
@@ -49,12 +43,9 @@ impl<'a> OSSLParamGetter<&'a [u8]> for OSSLParam {
 // This function can leave old data in the param's data buffer if the new data is shorter than what
 // was previously written to the buffer, which bothers me, but I believe it matches the way the
 // corresponding C function is implemented in OSSL, so maybe it's fine....
-impl<'a> TypedOSSLParamData<&'a [u8]> for OctetStringData {
+impl<'a> TypedOSSLParamData<&'a [u8]> for OctetStringData<'_> {
     fn set(&mut self, value: &'a [u8]) -> Result<(), OSSLParamError> {
-        if (self.param).is_null() {
-            return Err("self.param was null".to_string());
-        }
-        let p = unsafe { &mut *self.param };
+        let p = &mut *self.param;
         let len = value.len();
         p.return_size = len;
         if p.data.is_null() {
@@ -73,7 +64,7 @@ impl<'a> TypedOSSLParamData<&'a [u8]> for OctetStringData {
     }
 }
 
-impl TryFrom<*mut OSSL_PARAM> for OctetStringData {
+impl TryFrom<*mut OSSL_PARAM> for OctetStringData<'_> {
     type Error = OSSLParamError;
 
     fn try_from(param: *mut OSSL_PARAM) -> Result<Self, Self::Error> {

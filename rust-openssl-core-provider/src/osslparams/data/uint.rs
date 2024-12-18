@@ -11,19 +11,15 @@ impl PrimUIntMarker for u16 {}
 impl PrimUIntMarker for u32 {}
 impl PrimUIntMarker for u64 {}
 
-impl OSSLParamData for UIntData {
+impl OSSLParamData for UIntData<'_> {
     fn new_null(key: &KeyType) -> Self
     where
         Self: Sized,
     {
         let param_data = new_null_param!(UIntData, OSSL_PARAM_UNSIGNED_INTEGER, key);
         let buf = Box::into_raw(Box::new(0u64));
-        unsafe {
-            (*param_data.param).data = buf as *mut std::ffi::c_void;
-        }
-        unsafe {
-            (*param_data.param).data_size = size_of::<u64>();
-        }
+        param_data.param.data = buf as *mut std::ffi::c_void;
+        param_data.param.data_size = size_of::<u64>();
         param_data
     }
 }
@@ -63,16 +59,16 @@ impl_setter!(u16, UInt);
 impl_setter!(u32, UInt);
 impl_setter!(u64, UInt);
 
-impl OSSLParamGetter<u64> for OSSLParam {
+impl OSSLParamGetter<u64> for OSSLParam<'_> {
     fn get_inner(&self) -> Option<u64> {
         if let OSSLParam::UInt(d) = self {
-            unsafe {
-                let data = (*d.param).data;
-                match (*d.param).data_size {
-                    s if s == size_of::<u32>() => Some(std::ptr::read(data as *const u32) as u64),
-                    s if s == size_of::<u64>() => Some(std::ptr::read(data as *const u64)),
-                    _ => None,
+            let data = d.param.data;
+            match d.param.data_size {
+                s if s == size_of::<u32>() => {
+                    Some(unsafe { std::ptr::read(data as *const u32) } as u64)
                 }
+                s if s == size_of::<u64>() => Some(unsafe { std::ptr::read(data as *const u64) }),
+                _ => None,
             }
         } else {
             None
@@ -84,10 +80,10 @@ impl OSSLParamGetter<u64> for OSSLParam {
  * doesn't risk overlapping with other impls like `impl ... for OSSLParam` does.
  */
 
-impl<T: PrimUIntMarker> TypedOSSLParamData<T> for UIntData {
+impl<T: PrimUIntMarker> TypedOSSLParamData<T> for UIntData<'_> {
     // https://github.com/openssl/openssl/blob/7f62adaf2b088de38ad2e534d0bfae2ff7ae01f2/crypto/params.c#L937-L951
     fn set(&mut self, value: T) -> Result<(), OSSLParamError> {
-        let p = unsafe { &mut *self.param };
+        let p = &mut *self.param;
         p.return_size = size_of::<u64>();
         if p.data.is_null() {
             Ok(())
@@ -116,7 +112,7 @@ impl<T: PrimUIntMarker> TypedOSSLParamData<T> for UIntData {
     }
 }
 
-impl TryFrom<*mut OSSL_PARAM> for UIntData {
+impl TryFrom<*mut OSSL_PARAM> for UIntData<'_> {
     type Error = &'static str;
 
     fn try_from(param: *mut OSSL_PARAM) -> Result<Self, Self::Error> {
