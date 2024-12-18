@@ -10,19 +10,19 @@ mod inner_bindings {
 }
 
 pub mod forbidden {
-    use crate::bindings::ossl_param_st;
+    use crate::bindings::OSSL_PARAM;
 
     extern "C" {
         pub fn OSSL_PARAM_set_utf8_ptr(
-            p: *mut ossl_param_st,
+            p: *mut OSSL_PARAM,
             val: *const ::std::os::raw::c_char,
         ) -> ::std::os::raw::c_int;
     }
     extern "C" {
         pub fn OSSL_PARAM_locate(
-            p: *mut ossl_param_st,
+            p: *mut OSSL_PARAM,
             key: *const ::std::os::raw::c_char,
-        ) -> *mut ossl_param_st;
+        ) -> *mut OSSL_PARAM;
     }
 }
 

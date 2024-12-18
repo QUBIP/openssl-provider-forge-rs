@@ -1,7 +1,7 @@
 use std::ffi::CStr;
 
 use crate::bindings::{
-    ossl_param_st, OSSL_PARAM_INTEGER, OSSL_PARAM_OCTET_STRING, OSSL_PARAM_UNSIGNED_INTEGER,
+    OSSL_PARAM, OSSL_PARAM_INTEGER, OSSL_PARAM_OCTET_STRING, OSSL_PARAM_UNSIGNED_INTEGER,
     OSSL_PARAM_UTF8_PTR, OSSL_PARAM_UTF8_STRING,
 };
 
@@ -22,27 +22,27 @@ pub enum OSSLParam {
 
 #[derive(Debug, Clone)]
 pub struct Utf8PtrData {
-    param: *mut ossl_param_st,
+    param: *mut OSSL_PARAM,
 }
 
 #[derive(Debug, Clone)]
 pub struct Utf8StringData {
-    param: *mut ossl_param_st,
+    param: *mut OSSL_PARAM,
 }
 
 #[derive(Debug, Clone)]
 pub struct IntData {
-    param: *mut ossl_param_st,
+    param: *mut OSSL_PARAM,
 }
 
 #[derive(Debug, Clone)]
 pub struct UIntData {
-    param: *mut ossl_param_st,
+    param: *mut OSSL_PARAM,
 }
 
 #[derive(Debug, Clone)]
 pub struct OctetStringData {
-    param: *mut ossl_param_st,
+    param: *mut OSSL_PARAM,
 }
 
 pub type OSSLParamError = String;
@@ -64,7 +64,7 @@ impl OSSLParam {
         self.get_inner()
     }
 
-    pub fn get_c_struct(&self) -> *mut ossl_param_st {
+    pub fn get_c_struct(&self) -> *mut OSSL_PARAM {
         match self {
             OSSLParam::Utf8Ptr(d) => d.param,
             OSSLParam::Utf8String(d) => d.param,
@@ -165,34 +165,34 @@ macro_rules! impl_setter {
 
 pub(crate) use impl_setter;
 
-impl TryFrom<&mut ossl_param_st> for OSSLParam {
+impl TryFrom<&mut OSSL_PARAM> for OSSLParam {
     type Error = OSSLParamError;
 
-    fn try_from(value: &mut ossl_param_st) -> Result<Self, Self::Error> {
-        OSSLParam::try_from(value as *mut ossl_param_st)
+    fn try_from(value: &mut OSSL_PARAM) -> Result<Self, Self::Error> {
+        OSSLParam::try_from(value as *mut OSSL_PARAM)
     }
 }
 
-impl TryFrom<*mut ossl_param_st> for OSSLParam {
+impl TryFrom<*mut OSSL_PARAM> for OSSLParam {
     type Error = OSSLParamError;
 
-    fn try_from(p: *mut ossl_param_st) -> std::result::Result<Self, Self::Error> {
+    fn try_from(p: *mut OSSL_PARAM) -> std::result::Result<Self, Self::Error> {
         match unsafe { p.as_mut() } {
             Some(p) => match p.data_type {
                 OSSL_PARAM_UTF8_PTR => Ok(OSSLParam::Utf8Ptr(
-                    Utf8PtrData::try_from(p as *mut ossl_param_st).unwrap(),
+                    Utf8PtrData::try_from(p as *mut OSSL_PARAM).unwrap(),
                 )),
                 OSSL_PARAM_UTF8_STRING => Ok(OSSLParam::Utf8String(
-                    Utf8StringData::try_from(p as *mut ossl_param_st).unwrap(),
+                    Utf8StringData::try_from(p as *mut OSSL_PARAM).unwrap(),
                 )),
                 OSSL_PARAM_INTEGER => Ok(OSSLParam::Int(
-                    IntData::try_from(p as *mut ossl_param_st).unwrap(),
+                    IntData::try_from(p as *mut OSSL_PARAM).unwrap(),
                 )),
                 OSSL_PARAM_UNSIGNED_INTEGER => Ok(OSSLParam::UInt(
-                    UIntData::try_from(p as *mut ossl_param_st).unwrap(),
+                    UIntData::try_from(p as *mut OSSL_PARAM).unwrap(),
                 )),
                 OSSL_PARAM_OCTET_STRING => Ok(OSSLParam::OctetString(
-                    OctetStringData::try_from(p as *mut ossl_param_st).unwrap(),
+                    OctetStringData::try_from(p as *mut OSSL_PARAM).unwrap(),
                 )),
                 _ => Err("Couldn't convert to OSSLParam from *mut ossl_param_st".to_string()),
             },
@@ -201,7 +201,7 @@ impl TryFrom<*mut ossl_param_st> for OSSLParam {
     }
 }
 
-pub const OSSL_PARAM_END: ossl_param_st = ossl_param_st {
+pub const OSSL_PARAM_END: OSSL_PARAM = OSSL_PARAM {
     key: std::ptr::null(),
     data_type: 0,
     data: std::ptr::null_mut(),
@@ -209,7 +209,7 @@ pub const OSSL_PARAM_END: ossl_param_st = ossl_param_st {
     return_size: 0,
 };
 
-pub const EMPTY_PARAMS: [ossl_param_st; 1] = [OSSL_PARAM_END];
+pub const EMPTY_PARAMS: [OSSL_PARAM; 1] = [OSSL_PARAM_END];
 
 /*
  * core::ffi:c_size_t is only in nightly, and unstable
@@ -229,7 +229,7 @@ pub fn ossl_param_locate<'a>(
     params.iter_mut().find(|p| p.get_key() == key)
 }
 
-pub fn ossl_param_locate_raw(params: *mut ossl_param_st, key: &KeyType) -> Option<OSSLParam> {
+pub fn ossl_param_locate_raw(params: *mut OSSL_PARAM, key: &KeyType) -> Option<OSSLParam> {
     let mut i = 0;
     loop {
         let p = unsafe { &mut *params.offset(i) };
@@ -248,12 +248,12 @@ pub fn ossl_param_locate_raw(params: *mut ossl_param_st, key: &KeyType) -> Optio
     }
 }
 
-impl From<&mut ossl_param_st> for Vec<OSSLParam> {
-    fn from(params: &mut ossl_param_st) -> Self {
+impl From<&mut OSSL_PARAM> for Vec<OSSLParam> {
+    fn from(params: &mut OSSL_PARAM) -> Self {
         let mut v: Vec<OSSLParam> = Vec::new();
         let mut i = 0;
         loop {
-            let p = unsafe { &mut *(params as *mut ossl_param_st).offset(i) };
+            let p = unsafe { &mut *(params as *mut OSSL_PARAM).offset(i) };
             if p.key.is_null() {
                 break;
             } else {

@@ -1,6 +1,6 @@
 use num_traits::ToPrimitive;
 
-use crate::bindings::{ossl_param_st, OSSL_PARAM_INTEGER};
+use crate::bindings::{OSSL_PARAM, OSSL_PARAM_INTEGER};
 use crate::osslparams::{
     impl_setter, new_null_param, IntData, KeyType, OSSLParam, OSSLParamData, OSSLParamError,
     OSSLParamGetter, TypedOSSLParamData,
@@ -116,10 +116,10 @@ impl<T: PrimIntMarker> TypedOSSLParamData<T> for IntData {
     }
 }
 
-impl TryFrom<*mut ossl_param_st> for IntData {
+impl TryFrom<*mut OSSL_PARAM> for IntData {
     type Error = &'static str;
 
-    fn try_from(param: *mut ossl_param_st) -> Result<Self, Self::Error> {
+    fn try_from(param: *mut OSSL_PARAM) -> Result<Self, Self::Error> {
         match unsafe { param.as_mut() } {
             Some(param) => {
                 if param.data_type != OSSL_PARAM_INTEGER {

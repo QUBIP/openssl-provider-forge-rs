@@ -1,6 +1,6 @@
 use std::slice::from_raw_parts;
 
-use crate::bindings::{ossl_param_st, OSSL_PARAM_OCTET_STRING};
+use crate::bindings::{OSSL_PARAM, OSSL_PARAM_OCTET_STRING};
 use crate::osslparams::{
     impl_setter, new_null_param, KeyType, OSSLParam, OSSLParamData, OSSLParamError,
     OSSLParamGetter, OctetStringData, TypedOSSLParamData,
@@ -73,10 +73,10 @@ impl<'a> TypedOSSLParamData<&'a [u8]> for OctetStringData {
     }
 }
 
-impl TryFrom<*mut ossl_param_st> for OctetStringData {
+impl TryFrom<*mut OSSL_PARAM> for OctetStringData {
     type Error = OSSLParamError;
 
-    fn try_from(param: *mut ossl_param_st) -> Result<Self, Self::Error> {
+    fn try_from(param: *mut OSSL_PARAM) -> Result<Self, Self::Error> {
         match unsafe { param.as_mut() } {
             Some(param) => {
                 if param.data_type != OSSL_PARAM_OCTET_STRING {

@@ -1,4 +1,4 @@
-use crate::bindings::{ossl_param_st, OSSL_PARAM_UNSIGNED_INTEGER};
+use crate::bindings::{OSSL_PARAM, OSSL_PARAM_UNSIGNED_INTEGER};
 use crate::osslparams::{
     impl_setter, new_null_param, KeyType, OSSLParam, OSSLParamData, OSSLParamError,
     OSSLParamGetter, TypedOSSLParamData, UIntData,
@@ -116,10 +116,10 @@ impl<T: PrimUIntMarker> TypedOSSLParamData<T> for UIntData {
     }
 }
 
-impl TryFrom<*mut ossl_param_st> for UIntData {
+impl TryFrom<*mut OSSL_PARAM> for UIntData {
     type Error = &'static str;
 
-    fn try_from(param: *mut ossl_param_st) -> Result<Self, Self::Error> {
+    fn try_from(param: *mut OSSL_PARAM) -> Result<Self, Self::Error> {
         match unsafe { param.as_mut() } {
             Some(param) => {
                 if param.data_type != OSSL_PARAM_UNSIGNED_INTEGER {

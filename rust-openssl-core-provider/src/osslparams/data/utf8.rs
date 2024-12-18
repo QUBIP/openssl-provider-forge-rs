@@ -1,6 +1,6 @@
 use std::ffi::{c_char, CStr};
 
-use crate::bindings::{ossl_param_st, OSSL_PARAM_UTF8_PTR, OSSL_PARAM_UTF8_STRING};
+use crate::bindings::{OSSL_PARAM, OSSL_PARAM_UTF8_PTR, OSSL_PARAM_UTF8_STRING};
 use crate::osslparams::{
     new_null_param, setter_type_err_string, KeyType, OSSLParam, OSSLParamData, OSSLParamError,
     OSSLParamGetter, OSSLParamSetter, TypedOSSLParamData, Utf8PtrData, Utf8StringData,
@@ -135,10 +135,10 @@ impl TypedOSSLParamData<*const CStr> for Utf8StringData {
  * think things would get more complicated.
 */
 
-impl TryFrom<*mut ossl_param_st> for Utf8PtrData {
+impl TryFrom<*mut OSSL_PARAM> for Utf8PtrData {
     type Error = OSSLParamError;
 
-    fn try_from(param: *mut ossl_param_st) -> Result<Self, Self::Error> {
+    fn try_from(param: *mut OSSL_PARAM) -> Result<Self, Self::Error> {
         match unsafe { param.as_mut() } {
             Some(param) => {
                 if param.data_type != OSSL_PARAM_UTF8_PTR {
@@ -152,10 +152,10 @@ impl TryFrom<*mut ossl_param_st> for Utf8PtrData {
     }
 }
 
-impl TryFrom<*mut ossl_param_st> for Utf8StringData {
+impl TryFrom<*mut OSSL_PARAM> for Utf8StringData {
     type Error = OSSLParamError;
 
-    fn try_from(param: *mut ossl_param_st) -> Result<Self, Self::Error> {
+    fn try_from(param: *mut OSSL_PARAM) -> Result<Self, Self::Error> {
         match unsafe { param.as_mut() } {
             Some(param) => {
                 if param.data_type != OSSL_PARAM_UTF8_STRING {

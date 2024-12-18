@@ -6,7 +6,7 @@ use std::ptr;
 #[test]
 fn test_int_data() {
     let mut int_data = IntData {
-        param: &mut ossl_param_st {
+        param: &mut OSSL_PARAM {
             data: ptr::null_mut(),
             return_size: 0,
             data_type: OSSL_PARAM_INTEGER,
@@ -24,7 +24,7 @@ fn test_int_data() {
 #[test]
 fn test_uint_data_() {
     let mut uint_data = UIntData {
-        param: &mut ossl_param_st {
+        param: &mut OSSL_PARAM {
             data: ptr::null_mut(),
             return_size: 0,
             data_type: OSSL_PARAM_UNSIGNED_INTEGER,
@@ -44,7 +44,7 @@ fn test_uint_data_() {
 
 #[test]
 fn test_utf8_ptr_data_set() {
-    let mut ossl_param = ossl_param_st {
+    let mut ossl_param = OSSL_PARAM {
         data: std::ptr::null_mut(),
         data_type: OSSL_PARAM_UTF8_PTR,
         return_size: 0,
