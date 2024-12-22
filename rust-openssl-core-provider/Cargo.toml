@@ -21,3 +21,4 @@ pretty_env_logger = { version = "0.5", optional = true }
 
 [build-dependencies]
 bindgen = "0.70"
+pkg-config = "0.3"
