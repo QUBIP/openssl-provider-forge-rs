@@ -1,4 +1,4 @@
-use std::ffi::CStr;
+use std::{ffi::CStr, marker::PhantomData};
 
 use crate::bindings::{
     OSSL_PARAM, OSSL_PARAM_INTEGER, OSSL_PARAM_OCTET_STRING, OSSL_PARAM_UNSIGNED_INTEGER,
@@ -243,24 +243,35 @@ pub fn ossl_param_locate_raw(params: *mut OSSL_PARAM, key: &KeyType) -> Option<O
     }
 }
 
-impl<'a> From<&mut OSSL_PARAM> for Vec<OSSLParam<'a>> {
-    fn from(params: &mut OSSL_PARAM) -> Self {
-        let mut v: Vec<OSSLParam> = Vec::new();
-        let mut i = 0;
-        loop {
-            let p = unsafe { &mut *(params as *mut OSSL_PARAM).offset(i) };
-            if p.key.is_null() {
-                break;
-            } else {
-                match OSSLParam::try_from(&mut *p) {
-                    Ok(param) => v.push(param),
-                    Err(_) => {
-                        eprintln!("Unimplemented param data type: {:?}", p.data_type);
-                    }
-                }
-            }
-            i += 1;
+pub struct OSSLParamIter<'a> {
+    ptr: *mut OSSL_PARAM,
+    phantom: PhantomData<OSSLParam<'a>>,
+}
+
+impl OSSLParamIter<'_> {
+    pub fn new(ptr: *const OSSL_PARAM) -> Self {
+        OSSLParamIter {
+            ptr: ptr as *mut OSSL_PARAM,
+            phantom: PhantomData,
         }
-        v
+    }
+}
+
+impl<'a> Iterator for OSSLParamIter<'a> {
+    type Item = OSSLParam<'a>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        match unsafe { self.ptr.as_ref() } {
+            Some(p) => {
+                if p.key.is_null() {
+                    // we've reached OSSL_PARAM_END
+                    return None;
+                }
+                let param = OSSLParam::try_from(self.ptr);
+                self.ptr = unsafe { self.ptr.offset(1) };
+                param.ok()
+            }
+            None => return None,
+        }
     }
 }
