@@ -77,7 +77,7 @@ macro_rules! dispatch_table_entry {
         //const fn check_dispatch_table_entry_type<F>(_f: F) {}
         //check_dispatch_table_entry_type::<$f_type>(Some($f_name));
         let _: Option<$f_type> = None;
-        OSSL_DISPATCH::new(
+        $crate::bindings::OSSL_DISPATCH::new(
             // Why we need to cast the function ID: bindgen has to guess
             // at the type for `#define`d constants, and it guesses u32,
             // which conflicts with the type of the `function_id` field.
