@@ -64,9 +64,7 @@ impl<'a> OSSLParam<'a> {
         self.get_inner()
     }
 
-    // TODO: rename this to get_c_struct_mut and make a non-mut version of it, and use the non-mut
-    // version where appropriate (particularly in get_key() and in modified(), just below here)
-    pub fn get_c_struct(&mut self) -> *mut OSSL_PARAM {
+    pub fn get_c_struct(&self) -> *const OSSL_PARAM {
         match self {
             OSSLParam::Utf8Ptr(d) => d.param,
             OSSLParam::Utf8String(d) => d.param,
@@ -76,8 +74,30 @@ impl<'a> OSSLParam<'a> {
         }
     }
 
-    pub fn get_key(&mut self) -> &KeyType {
-        unsafe { CStr::from_ptr((*self.get_c_struct()).key) }
+    pub fn get_c_struct_mut(&mut self) -> *mut OSSL_PARAM {
+        match self {
+            OSSLParam::Utf8Ptr(d) => d.param,
+            OSSLParam::Utf8String(d) => d.param,
+            OSSLParam::Int(d) => d.param,
+            OSSLParam::UInt(d) => d.param,
+            OSSLParam::OctetString(d) => d.param,
+        }
+    }
+
+    pub fn get_key(&self) -> Option<&KeyType> {
+        let cptr: *const OSSL_PARAM = self.get_c_struct();
+        if cptr.is_null() {
+            return None;
+        }
+        let r = &(unsafe { *cptr });
+        let k = unsafe { CStr::from_ptr(r.key) };
+        Some(k)
+    }
+
+    pub fn get_data_type(&self) -> Option<u32> {
+        let cptr: *const OSSL_PARAM = self.get_c_struct();
+        let r = &(unsafe { *cptr });
+        Some(r.data_type)
     }
 
     // corresponds to OSSL_PARAM_modified()
@@ -203,6 +223,51 @@ impl<'a> TryFrom<*mut OSSL_PARAM> for OSSLParam<'a> {
     }
 }
 
+impl<'a> TryFrom<*const OSSL_PARAM> for OSSLParam<'a> {
+    type Error = OSSLParamError;
+
+    fn try_from(p: *const OSSL_PARAM) -> std::result::Result<Self, Self::Error> {
+        let m = p as *mut OSSL_PARAM;
+        OSSLParam::try_from(m)
+    }
+}
+
+impl<'a> From<&mut OSSLParam<'a>> for *mut OSSL_PARAM {
+    fn from(val: &mut OSSLParam<'a>) -> Self {
+        match val {
+            OSSLParam::Utf8Ptr(d) => d.param as *mut OSSL_PARAM,
+            OSSLParam::Utf8String(d) => d.param as *mut OSSL_PARAM,
+            OSSLParam::Int(d) => d.param as *mut OSSL_PARAM,
+            OSSLParam::UInt(d) => d.param as *mut OSSL_PARAM,
+            OSSLParam::OctetString(d) => d.param as *mut OSSL_PARAM,
+        }
+    }
+}
+
+impl<'a> From<&OSSLParam<'a>> for *const OSSL_PARAM {
+    fn from(val: &OSSLParam<'a>) -> Self {
+        match val {
+            OSSLParam::Utf8Ptr(d) => d.param as *const OSSL_PARAM,
+            OSSLParam::Utf8String(d) => d.param as *const OSSL_PARAM,
+            OSSLParam::Int(d) => d.param as *const OSSL_PARAM,
+            OSSLParam::UInt(d) => d.param as *const OSSL_PARAM,
+            OSSLParam::OctetString(d) => d.param as *const OSSL_PARAM,
+        }
+    }
+}
+
+impl<'a> From<OSSLParam<'a>> for *mut OSSL_PARAM {
+    fn from(mut val: OSSLParam<'a>) -> Self {
+        (&mut val).into()
+    }
+}
+
+impl<'a> From<OSSLParam<'a>> for *const OSSL_PARAM {
+    fn from(val: OSSLParam<'a>) -> Self {
+        (&val).into()
+    }
+}
+
 pub const OSSL_PARAM_END: OSSL_PARAM = OSSL_PARAM {
     key: std::ptr::null(),
     data_type: 0,
@@ -243,21 +308,21 @@ pub fn ossl_param_locate_raw(params: *mut OSSL_PARAM, key: &KeyType) -> Option<O
     }
 }
 
-pub struct OSSLParamIter<'a> {
+pub struct OSSLParamIterator<'a> {
     ptr: *mut OSSL_PARAM,
     phantom: PhantomData<OSSLParam<'a>>,
 }
 
-impl OSSLParamIter<'_> {
-    pub fn new(ptr: *const OSSL_PARAM) -> Self {
-        OSSLParamIter {
+impl OSSLParamIterator<'_> {
+    fn new(ptr: *const OSSL_PARAM) -> Self {
+        OSSLParamIterator {
             ptr: ptr as *mut OSSL_PARAM,
             phantom: PhantomData,
         }
     }
 }
 
-impl<'a> Iterator for OSSLParamIter<'a> {
+impl<'a> Iterator for OSSLParamIterator<'a> {
     type Item = OSSLParam<'a>;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -273,5 +338,15 @@ impl<'a> Iterator for OSSLParamIter<'a> {
             }
             None => return None,
         }
+    }
+}
+
+impl<'a> IntoIterator for OSSLParam<'a> {
+    type Item = Self;
+
+    type IntoIter = OSSLParamIterator<'a>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        OSSLParamIterator::new(self.get_c_struct())
     }
 }
