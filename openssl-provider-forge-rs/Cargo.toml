@@ -1,5 +1,5 @@
 [package]
-name = "rust-openssl-core-provider"
+name = "openssl_provider_forge"
 version.workspace = true
 edition = "2021"
 
