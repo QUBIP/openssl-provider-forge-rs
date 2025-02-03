@@ -50,7 +50,7 @@ fn test_params_intoiterator() {
             OSSL_PARAM {
                 key: c"AnArbitraryKey".as_ptr(),
                 data: d.as_ptr() as *mut std::ffi::c_void,
-                data_type: OSSL_PARAM_UTF8_PTR,
+                data_type: OSSL_PARAM_UTF8_STRING,
                 return_size: 0,
                 data_size: dl,
             }
@@ -61,7 +61,7 @@ fn test_params_intoiterator() {
             OSSL_PARAM {
                 key: c"B".as_ptr(),
                 data: d.as_ptr() as *mut std::ffi::c_void,
-                data_type: OSSL_PARAM_UTF8_PTR,
+                data_type: OSSL_PARAM_UTF8_STRING,
                 return_size: 0,
                 data_size: dl,
             }

@@ -1,4 +1,7 @@
-use std::{ffi::CStr, marker::PhantomData};
+use std::{
+    ffi::{CStr, CString},
+    marker::PhantomData,
+};
 
 use crate::bindings::{
     OSSL_PARAM, OSSL_PARAM_INTEGER, OSSL_PARAM_OCTET_STRING, OSSL_PARAM_UNSIGNED_INTEGER,
@@ -18,6 +21,36 @@ pub enum OSSLParam<'a> {
     Int(IntData<'a>),
     UInt(UIntData<'a>),
     OctetString(OctetStringData<'a>),
+}
+
+impl<'a> OSSLParam<'a> {
+    pub fn new_utf8ptr(key: &'a KeyType, value: &'a CStr) -> OSSL_PARAM {
+        let vl = value.count_bytes() + 1;
+        let v = value.as_ptr() as *mut std::ffi::c_void;
+        OSSL_PARAM {
+            key: key.as_ptr().cast(),
+            data_type: OSSL_PARAM_UTF8_PTR,
+            data: v,
+            data_size: vl,
+            return_size: 0,
+        }
+    }
+
+    pub fn new_utf8string(_key: &'a KeyType, _value: CString) -> OSSL_PARAM {
+        todo!()
+    }
+
+    pub fn new_int() -> OSSL_PARAM {
+        todo!()
+    }
+
+    pub fn new_uint() -> OSSL_PARAM {
+        todo!()
+    }
+
+    pub fn new_octetstring() -> Self {
+        todo!()
+    }
 }
 
 #[derive(Debug)]
