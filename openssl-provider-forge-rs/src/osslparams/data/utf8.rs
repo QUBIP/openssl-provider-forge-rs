@@ -63,8 +63,9 @@ impl<'a> OSSLParamGetter<&'a CStr> for OSSLParam<'_> {
             let ptr = d.param.data as *const *mut c_char;
             Some(unsafe { CStr::from_ptr(*ptr) })
         } else if let OSSLParam::Utf8String(d) = self {
-            let _ = d;
-            todo!("impl<'a> OSSLParamGetter<&'a CStr> for OSSLParam<'_>")
+            let ptr = d.param.data as *const c_char;
+            let v = unsafe { CStr::from_ptr(ptr) };
+            Some(v)
         } else {
             None
         }
