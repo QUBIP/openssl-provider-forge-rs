@@ -95,14 +95,52 @@ impl std::fmt::Debug for Utf8StringData<'_> {
     }
 }
 
-#[derive(Debug)]
 pub struct IntData<'a> {
     param: &'a mut OSSL_PARAM,
 }
 
-#[derive(Debug)]
+impl std::fmt::Debug for IntData<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let p = OSSLParam::try_from(self.param as *const OSSL_PARAM);
+        match p {
+            Ok(p) => {
+                let v: Option<i64> = p.get();
+                f.debug_struct("IntData")
+                    .field("param", &self.param)
+                    .field(".key", &p.get_key())
+                    .field(".value", &v)
+                    .finish()
+            }
+            Err(e) => f
+                .debug_struct("IntData")
+                .field("!ERROR", &format!("{e:?}"))
+                .finish(),
+        }
+    }
+}
+
 pub struct UIntData<'a> {
     param: &'a mut OSSL_PARAM,
+}
+
+impl std::fmt::Debug for UIntData<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let p = OSSLParam::try_from(self.param as *const OSSL_PARAM);
+        match p {
+            Ok(p) => {
+                let v: Option<u64> = p.get();
+                f.debug_struct("UIntData")
+                    .field("param", &self.param)
+                    .field(".key", &p.get_key())
+                    .field(".value", &v)
+                    .finish()
+            }
+            Err(e) => f
+                .debug_struct("UIntData")
+                .field("!ERROR", &format!("{e:?}"))
+                .finish(),
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -155,6 +193,9 @@ impl<'a> OSSLParam<'a> {
             return None;
         }
         let r = &(unsafe { *cptr });
+        if r.key.is_null() {
+            return None;
+        }
         let k = unsafe { CStr::from_ptr(r.key) };
         Some(k)
     }
@@ -266,21 +307,19 @@ impl<'a> TryFrom<*mut OSSL_PARAM> for OSSLParam<'a> {
     fn try_from(p: *mut OSSL_PARAM) -> std::result::Result<Self, Self::Error> {
         match unsafe { p.as_mut() } {
             Some(p) => match p.data_type {
-                OSSL_PARAM_UTF8_PTR => Ok(OSSLParam::Utf8Ptr(
-                    Utf8PtrData::try_from(p as *mut OSSL_PARAM).unwrap(),
-                )),
-                OSSL_PARAM_UTF8_STRING => Ok(OSSLParam::Utf8String(
-                    Utf8StringData::try_from(p as *mut OSSL_PARAM).unwrap(),
-                )),
-                OSSL_PARAM_INTEGER => Ok(OSSLParam::Int(
-                    IntData::try_from(p as *mut OSSL_PARAM).unwrap(),
-                )),
-                OSSL_PARAM_UNSIGNED_INTEGER => Ok(OSSLParam::UInt(
-                    UIntData::try_from(p as *mut OSSL_PARAM).unwrap(),
-                )),
-                OSSL_PARAM_OCTET_STRING => Ok(OSSLParam::OctetString(
-                    OctetStringData::try_from(p as *mut OSSL_PARAM).unwrap(),
-                )),
+                OSSL_PARAM_UTF8_PTR => Ok(OSSLParam::Utf8Ptr(Utf8PtrData::try_from(
+                    p as *mut OSSL_PARAM,
+                )?)),
+                OSSL_PARAM_UTF8_STRING => Ok(OSSLParam::Utf8String(Utf8StringData::try_from(
+                    p as *mut OSSL_PARAM,
+                )?)),
+                OSSL_PARAM_INTEGER => Ok(OSSLParam::Int(IntData::try_from(p as *mut OSSL_PARAM)?)),
+                OSSL_PARAM_UNSIGNED_INTEGER => {
+                    Ok(OSSLParam::UInt(UIntData::try_from(p as *mut OSSL_PARAM)?))
+                }
+                OSSL_PARAM_OCTET_STRING => Ok(OSSLParam::OctetString(OctetStringData::try_from(
+                    p as *mut OSSL_PARAM,
+                )?)),
                 _ => Err("Couldn't convert to OSSLParam from *mut OSSL_PARAM".to_string()),
             },
             None => Err("Couldn't convert to OSSLParam from null pointer".to_string()),

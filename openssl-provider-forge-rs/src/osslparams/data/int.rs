@@ -35,6 +35,9 @@ impl OSSLParamGetter<i32> for OSSLParam<'_> {
         if let OSSLParam::Int(d) = self {
             let param = &*d.param;
             let data = param.data;
+            if data.is_null() {
+                return None;
+            }
             let data_size = param.data_size;
             // ^ check that this stuff isn't null etc
             match data_size {
@@ -66,6 +69,9 @@ impl OSSLParamGetter<i64> for OSSLParam<'_> {
     fn get_inner(&self) -> Option<i64> {
         if let OSSLParam::Int(d) = self {
             let data = d.param.data;
+            if data.is_null() {
+                return None;
+            }
             match d.param.data_size {
                 s if s == size_of::<i32>() => {
                     Some(unsafe { std::ptr::read(data as *const i32) } as i64)
