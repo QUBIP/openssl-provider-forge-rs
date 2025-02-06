@@ -79,9 +79,20 @@ pub struct Utf8PtrData<'a> {
     param: &'a mut OSSL_PARAM,
 }
 
-#[derive(Debug)]
 pub struct Utf8StringData<'a> {
     param: &'a mut OSSL_PARAM,
+}
+
+impl std::fmt::Debug for Utf8StringData<'_> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let p: OSSLParam = OSSLParam::try_from(self.param as *const OSSL_PARAM).unwrap();
+        let v: Option<&CStr> = p.get();
+        f.debug_struct("Utf8StringData")
+            .field("param", &self.param)
+            .field(".key", &p.get_key())
+            .field(".value", &v)
+            .finish()
+    }
 }
 
 #[derive(Debug)]
