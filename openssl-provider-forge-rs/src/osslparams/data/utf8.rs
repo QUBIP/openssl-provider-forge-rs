@@ -61,7 +61,8 @@ impl<'a> OSSLParamGetter<&'a CStr> for OSSLParam<'_> {
     fn get_inner(&self) -> Option<&'a CStr> {
         if let OSSLParam::Utf8Ptr(d) = self {
             let ptr = d.param.data as *const *mut c_char;
-            Some(unsafe { CStr::from_ptr(*ptr) })
+            let v = unsafe { CStr::from_ptr(*ptr) };
+            Some(v)
         } else if let OSSLParam::Utf8String(d) = self {
             let ptr = d.param.data as *const c_char;
             let v = unsafe { CStr::from_ptr(ptr) };
