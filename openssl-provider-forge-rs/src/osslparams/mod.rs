@@ -235,7 +235,10 @@ impl<'a> OSSLParam<'a> {
     // returns e.g. "Int" if self is an OSSLParam::Int(IntData)
     fn variant_name(&self) -> String {
         let s = format!("{:?}", self);
-        s.split("(").next().unwrap().to_owned()
+        s.split("(")
+            .next()
+            .unwrap_or_else(|| unreachable!())
+            .to_owned()
     }
 }
 
