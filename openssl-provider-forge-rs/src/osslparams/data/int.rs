@@ -6,7 +6,7 @@ use crate::osslparams::{
     OSSLParamGetter, TypedOSSLParamData,
 };
 
-trait PrimIntMarker: num_traits::PrimInt {}
+pub trait PrimIntMarker: num_traits::PrimInt {}
 
 impl PrimIntMarker for i8 {}
 impl PrimIntMarker for i16 {}

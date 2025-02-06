@@ -29,17 +29,18 @@ mod generic {
         assert!(result.is_err());
 
         let k = c"test_key";
-        let mut op_utf8ptr = OSSLParam::new_utf8ptr(k, c"test_value");
-        let result = Utf8PtrData::try_from(&mut op_utf8ptr as *mut OSSL_PARAM);
+        let mut op_utf8str = OSSLParam::new_const_utf8string(k, c"test_value");
+        let result = Utf8StringData::try_from(&mut op_utf8str as *mut OSSL_PARAM);
         println!("{result:?}");
         // Check that the result is Ok
         assert!(result.is_ok());
 
-        let op = OSSLParam::try_from(&mut op_utf8ptr as *mut OSSL_PARAM);
+        let op = OSSLParam::try_from(&mut op_utf8str as *mut OSSL_PARAM);
         assert!(op.is_ok());
         let op = op.unwrap();
         println!("{op:?}");
-        assert_eq!(op.get_data_type().unwrap(), OSSL_PARAM_UTF8_PTR);
+        assert_eq!(op.get_data_type().unwrap(), OSSL_PARAM_UTF8_STRING);
         assert_eq!(op.get_key().unwrap(), k);
+        assert_eq!(op.get::<&CStr>(), Some(c"test_value"));
     }
 }

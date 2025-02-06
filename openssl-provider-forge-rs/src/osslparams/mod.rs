@@ -1,7 +1,4 @@
-use std::{
-    ffi::{CStr, CString},
-    marker::PhantomData,
-};
+use std::{ffi::CStr, marker::PhantomData};
 
 use crate::bindings::{
     OSSL_PARAM, OSSL_PARAM_INTEGER, OSSL_PARAM_OCTET_STRING, OSSL_PARAM_UNSIGNED_INTEGER,
@@ -24,31 +21,55 @@ pub enum OSSLParam<'a> {
 }
 
 impl<'a> OSSLParam<'a> {
-    pub fn new_utf8ptr(key: &'a KeyType, value: &'a CStr) -> OSSL_PARAM {
-        let vl = value.count_bytes() + 1;
+    pub fn new_const_utf8ptr(key: &'a KeyType, value: &'a CStr) -> OSSL_PARAM {
+        let _ = value;
+        let _ = key;
+        todo!()
+    }
+
+    pub fn new_const_utf8string(key: &'a KeyType, value: &'a CStr) -> OSSL_PARAM {
+        let vl = value.count_bytes();
         let v = value.as_ptr() as *mut std::ffi::c_void;
         OSSL_PARAM {
             key: key.as_ptr().cast(),
-            data_type: OSSL_PARAM_UTF8_PTR,
+            data_type: OSSL_PARAM_UTF8_STRING,
             data: v,
             data_size: vl,
-            return_size: 0,
+            return_size: OSSL_PARAM_UNMODIFIED,
         }
     }
 
-    pub fn new_utf8string(_key: &'a KeyType, _value: CString) -> OSSL_PARAM {
-        todo!()
+    pub fn new_const_int<T>(key: &'a KeyType, value: &'a T) -> OSSL_PARAM
+    where
+        T: crate::osslparams::data::int::PrimIntMarker,
+    {
+        let v = std::ptr::from_ref(value);
+        OSSL_PARAM {
+            key: key.as_ptr().cast(),
+            data_type: OSSL_PARAM_INTEGER,
+            data: v as *mut std::ffi::c_void,
+            data_size: size_of::<T>(),
+            return_size: OSSL_PARAM_UNMODIFIED,
+        }
     }
 
-    pub fn new_int() -> OSSL_PARAM {
-        todo!()
+    pub fn new_const_uint<T>(key: &'a KeyType, value: &'a T) -> OSSL_PARAM
+    where
+        T: crate::osslparams::data::uint::PrimUIntMarker,
+    {
+        let v = std::ptr::from_ref(value);
+        OSSL_PARAM {
+            key: key.as_ptr().cast(),
+            data_type: OSSL_PARAM_UNSIGNED_INTEGER,
+            data: v as *mut std::ffi::c_void,
+            data_size: size_of::<T>(),
+            return_size: OSSL_PARAM_UNMODIFIED,
+        }
     }
 
-    pub fn new_uint() -> OSSL_PARAM {
-        todo!()
-    }
-
-    pub fn new_octetstring() -> Self {
+    pub fn new_const_octetstring(key: &'a KeyType, value: &'a [i8]) -> OSSL_PARAM {
+        let _ = key;
+        let _ = value;
         todo!()
     }
 }
