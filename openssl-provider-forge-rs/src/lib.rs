@@ -1,4 +1,5 @@
 pub mod bindings;
+pub mod osslcb;
 pub mod osslparams;
 
 pub type OurError = anyhow::Error;
@@ -40,18 +41,3 @@ pub mod keymgmt {
         }
     }
 }
-
-// pub fn add(left: usize, right: usize) -> usize {
-//     left + right
-// }
-//
-// #[cfg(test)]
-// mod tests {
-//     use super::*;
-//
-//     #[test]
-//     fn it_works() {
-//         let result = add(2, 2);
-//         assert_eq!(result, 4);
-//     }
-// }
