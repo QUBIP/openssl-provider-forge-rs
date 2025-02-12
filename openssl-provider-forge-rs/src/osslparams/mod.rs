@@ -21,16 +21,16 @@ pub enum OSSLParam<'a> {
 }
 
 impl<'a> OSSLParam<'a> {
-    pub fn new_const_utf8ptr(key: &'a KeyType, value: &'a CStr) -> OSSL_PARAM {
+    pub fn new_const_utf8ptr(key: &'a KeyType, value: &'a CStr) -> CONST_OSSL_PARAM {
         let _ = value;
         let _ = key;
         todo!()
     }
 
-    pub fn new_const_utf8string(key: &'a KeyType, value: &'a CStr) -> OSSL_PARAM {
+    pub const fn new_const_utf8string(key: &'a KeyType, value: &'a CStr) -> CONST_OSSL_PARAM {
         let vl = value.count_bytes();
         let v = value.as_ptr() as *mut std::ffi::c_void;
-        OSSL_PARAM {
+        CONST_OSSL_PARAM {
             key: key.as_ptr().cast(),
             data_type: OSSL_PARAM_UTF8_STRING,
             data: v,
@@ -39,12 +39,12 @@ impl<'a> OSSLParam<'a> {
         }
     }
 
-    pub fn new_const_int<T>(key: &'a KeyType, value: &'a T) -> OSSL_PARAM
+    pub const fn new_const_int<T>(key: &'a KeyType, value: &'a T) -> CONST_OSSL_PARAM
     where
         T: crate::osslparams::data::int::PrimIntMarker,
     {
         let v = std::ptr::from_ref(value);
-        OSSL_PARAM {
+        CONST_OSSL_PARAM {
             key: key.as_ptr().cast(),
             data_type: OSSL_PARAM_INTEGER,
             data: v as *mut std::ffi::c_void,
@@ -53,12 +53,12 @@ impl<'a> OSSLParam<'a> {
         }
     }
 
-    pub fn new_const_uint<T>(key: &'a KeyType, value: &'a T) -> OSSL_PARAM
+    pub const fn new_const_uint<T>(key: &'a KeyType, value: &'a T) -> CONST_OSSL_PARAM
     where
         T: crate::osslparams::data::uint::PrimUIntMarker,
     {
         let v = std::ptr::from_ref(value);
-        OSSL_PARAM {
+        CONST_OSSL_PARAM {
             key: key.as_ptr().cast(),
             data_type: OSSL_PARAM_UNSIGNED_INTEGER,
             data: v as *mut std::ffi::c_void,
@@ -67,7 +67,7 @@ impl<'a> OSSLParam<'a> {
         }
     }
 
-    pub fn new_const_octetstring(key: &'a KeyType, value: &'a [i8]) -> OSSL_PARAM {
+    pub fn new_const_octetstring(key: &'a KeyType, value: &'a [i8]) -> CONST_OSSL_PARAM {
         let _ = key;
         let _ = value;
         todo!()
@@ -383,13 +383,17 @@ impl<'a> From<OSSLParam<'a>> for *const OSSL_PARAM {
     }
 }
 
-pub const OSSL_PARAM_END: OSSL_PARAM = OSSL_PARAM {
-    key: std::ptr::null(),
-    data_type: 0,
-    data: std::ptr::null_mut(),
-    data_size: 0,
-    return_size: 0,
-};
+impl OSSL_PARAM {
+    pub const END: Self = Self {
+        key: std::ptr::null(),
+        data_type: 0,
+        data: std::ptr::null_mut(),
+        data_size: 0,
+        return_size: 0,
+    };
+}
+
+pub const OSSL_PARAM_END: OSSL_PARAM = OSSL_PARAM::END;
 
 pub const EMPTY_PARAMS: [OSSL_PARAM; 1] = [OSSL_PARAM_END];
 
@@ -464,4 +468,43 @@ impl<'a> IntoIterator for OSSLParam<'a> {
     fn into_iter(self) -> Self::IntoIter {
         OSSLParamIterator::new(self.get_c_struct())
     }
+}
+
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+#[allow(non_camel_case_types)]
+pub struct CONST_OSSL_PARAM {
+    pub key: *const ::std::os::raw::c_char,
+    pub data_type: ::std::os::raw::c_uint,
+    pub data: *const ::std::os::raw::c_void,
+    pub data_size: usize,
+    pub return_size: usize,
+}
+
+// SAFETY: This is only valid if the C API guarantees that the data pointed by the inner pointers is actually immutable and thread-safe.
+unsafe impl Send for CONST_OSSL_PARAM {}
+unsafe impl Sync for CONST_OSSL_PARAM {}
+
+impl std::ops::Deref for CONST_OSSL_PARAM {
+    type Target = crate::bindings::ossl_param_st;
+
+    fn deref(&self) -> &Self::Target {
+        unsafe { &*(self as *const Self as *const Self::Target) }
+    }
+}
+
+impl From<&CONST_OSSL_PARAM> for *const crate::bindings::ossl_param_st {
+    fn from(param: &CONST_OSSL_PARAM) -> Self {
+        param as *const CONST_OSSL_PARAM as *const OSSL_PARAM
+    }
+}
+
+impl CONST_OSSL_PARAM {
+    pub const END: Self = Self {
+        key: std::ptr::null(),
+        data_type: 0,
+        data: std::ptr::null(),
+        data_size: 0,
+        return_size: 0,
+    };
 }
