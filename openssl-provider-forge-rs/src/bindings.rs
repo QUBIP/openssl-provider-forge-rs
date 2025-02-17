@@ -29,6 +29,9 @@ pub mod forbidden {
 /// Then we export as pub all the symbols from the inner module.
 pub use inner_bindings::*;
 
+/// We alias under this namespace the `CONST_OSSL_PARAM` type available under `crate::osslparams`
+pub use crate::osslparams::CONST_OSSL_PARAM;
+
 use ::std::os::raw::c_int;
 
 // Why we need to cast the function itself, in the call to `transmute`: the name
