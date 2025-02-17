@@ -1,5 +1,5 @@
 pub mod bindings;
-pub mod osslcb;
+pub mod ossl_callback;
 pub mod osslparams;
 
 pub type OurError = anyhow::Error;
