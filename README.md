@@ -86,11 +86,10 @@ Particularly these abstractions cover:
 [ossl:man:core]: https://docs.openssl.org/3.2/man7/openssl-core.h/
 [crates:rust-openssl]: https://crates.io/crates/openssl
 
-> [!INFO]
+> [!NOTE]
 > **Note on naming conventions**
 >
-> Notice that
-> the name of the repository follows `Github` conventions,
+> The name of the repository follows `Github` conventions,
 > while the name of the corresponding crate
 > follows `crates.io` conventions,
 > so the former is `openssl-provider-forge-rs`
