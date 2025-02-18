@@ -66,7 +66,7 @@ specifically for its `Core` and `Provider` API.
 This is different from the [`rust-openssl`][crates:rust-openssl] crate,
 which provides OpenSSL bindings for Rust applications.
 
-In this create, instead, we define constants and types
+In this crate, instead, we define constants and types
 useful to author [OpenSSL Providers][ossl:man:provider]
 written in Rust.
 The goal of this crate is to facilitate
