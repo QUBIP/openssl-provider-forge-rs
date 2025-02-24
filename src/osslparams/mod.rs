@@ -408,25 +408,6 @@ pub const EMPTY_PARAMS: [OSSL_PARAM; 1] = [OSSL_PARAM_END];
 // const OSSL_PARAM_UNMODIFIED: usize = core::ffi::c_size_t::MAX;
 const OSSL_PARAM_UNMODIFIED: usize = usize::MAX;
 
-pub fn ossl_param_locate_raw(params: *mut OSSL_PARAM, key: &KeyType) -> Option<OSSLParam> {
-    let mut i = 0;
-    loop {
-        let p = unsafe { &mut *params.offset(i) };
-        if p.key.is_null() {
-            return None;
-        } else if unsafe { CStr::from_ptr(p.key) } == key {
-            match OSSLParam::try_from(&mut *p) {
-                Ok(param) => return Some(param),
-                Err(_) => {
-                    eprintln!("Unimplemented param data type: {:?}", p.data_type);
-                    return None;
-                }
-            }
-        }
-        i += 1;
-    }
-}
-
 pub struct OSSLParamIterator<'a> {
     ptr: *mut OSSL_PARAM,
     phantom: PhantomData<OSSLParam<'a>>,
