@@ -1,3 +1,5 @@
+//! This submodule provides functionality for handling OpenSSL octetsdfsdsa parameters.
+
 use std::slice::from_raw_parts;
 
 use crate::bindings::{OSSL_PARAM, OSSL_PARAM_OCTET_STRING};

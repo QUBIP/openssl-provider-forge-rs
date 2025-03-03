@@ -1,3 +1,10 @@
+//! This submodule provides functionality for handling UTF-8 encoded strings using raw pointers.
+//!
+//! The `utf8_ptr` submodule focuses on dealing with UTF-8 strings stored in memory that are accessed through raw pointers.
+//! This is particularly useful when working with OpenSSL or other libraries that require efficient manipulation
+//! of strings via pointers.
+//!
+
 use std::ffi::{c_char, CStr};
 
 use crate::bindings::{OSSL_PARAM, OSSL_PARAM_UTF8_PTR, OSSL_PARAM_UTF8_STRING};
@@ -126,9 +133,14 @@ impl TypedOSSLParamData<*const CStr> for Utf8StringData<'_> {
  * think things would get more complicated.
 */
 
+/// Converts a raw pointer (`*mut ossl_param_st`) into an `OSSLParam` enum.
 impl TryFrom<*mut OSSL_PARAM> for Utf8PtrData<'_> {
     type Error = OSSLParamError;
 
+    /// The `try_from` function converts a raw pointer to an OpenSSL parameter (`ossl_param_st`)
+    /// into an appropriate variant of the `OSSLParam` enum. It performs safety checks to ensure
+    /// that the pointer is not null and that the `data_type` of the parameter matches one of the
+    /// expected OpenSSL parameter types.
     fn try_from(param: *mut OSSL_PARAM) -> Result<Self, Self::Error> {
         match unsafe { param.as_mut() } {
             Some(param) => {

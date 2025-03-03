@@ -1,3 +1,11 @@
+//! This submodule provides functionality for handling OpenSSL integer parameters.
+//!
+//! The `int` submodule focuses on handling and converting OpenSSL integer types, represented by
+//! the `OSSL_PARAM_INTEGER`. It provides type-safe wrappers and utility functions for working with
+//! different integer sizes (e.g., `i8`, `i16`, `i32`, and `i64`) and for interacting with OpenSSL
+//! parameter structures.
+//!
+
 use num_traits::ToPrimitive;
 
 use crate::bindings::{OSSL_PARAM, OSSL_PARAM_INTEGER};
@@ -6,6 +14,7 @@ use crate::osslparams::{
     OSSLParamGetter, TypedOSSLParamData,
 };
 
+/// A marker trait that extends `PrimInt` from `num_traits`, indicating that a type is a primitive integer.
 pub trait PrimIntMarker: num_traits::PrimInt {}
 
 impl PrimIntMarker for i8 {}
@@ -117,9 +126,28 @@ impl<T: PrimIntMarker> TypedOSSLParamData<T> for IntData<'_> {
     }
 }
 
+/// Converts a raw pointer (`*mut ossl_param_st`) into an `OSSLParam` enum.
 impl TryFrom<*mut OSSL_PARAM> for IntData<'_> {
     type Error = &'static str;
 
+    /// Converts a raw OpenSSL parameter (`ossl_param_st`) to an `OSSLParam` enum variant.
+    /// Ensures the pointer is not null and that the `data_type` matches an expected OpenSSL parameter type.
+    /// # Examples
+    ///
+    /// ```rust
+    /// use osslparams::OSSLParam;
+    ///
+    /// // Assume we have a raw pointer `param_ptr` of type `*mut ossl_param_st`.
+    /// // For demonstration, we are using a null pointer here:
+    /// let param_ptr: *mut ossl_param_st = std::ptr::null_mut();
+    ///
+    /// // Attempt to convert the pointer into an `OSSLParam`.
+    /// match OSSLParam::try_from(param_ptr) {
+    ///     Ok(param) => println!("Successfully converted to OSSLParam."),
+    ///     Err(e) => println!("Failed to convert: {:?}", e),
+    /// }
+    /// ```
+    ///
     fn try_from(param: *mut OSSL_PARAM) -> Result<Self, Self::Error> {
         match unsafe { param.as_mut() } {
             Some(param) => {

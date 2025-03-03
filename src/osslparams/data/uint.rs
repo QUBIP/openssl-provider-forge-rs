@@ -1,9 +1,18 @@
+//! This submodule provides functionality for handling OpenSSL unsigned integer parameters.
+//!
+//! The `uint` submodule focuses on handling and converting OpenSSL unsigned integer types, represented by
+//! the `OSSL_PARAM_UNSIGNED_INTEGER`. It provides type-safe wrappers and utility functions for working with
+//! different unsigned integer sizes (e.g., `u8`, `u16`, `u32`, and `u64`) and for interacting with OpenSSL
+//! parameter structures.
+//!
+//!
 use crate::bindings::{OSSL_PARAM, OSSL_PARAM_UNSIGNED_INTEGER};
 use crate::osslparams::{
     impl_setter, new_null_param, KeyType, OSSLParam, OSSLParamData, OSSLParamError,
     OSSLParamGetter, TypedOSSLParamData, UIntData,
 };
 
+/// A marker trait that extends `PrimInt` from `num_traits`, indicating that a type is a primitive unsigned integer.
 pub trait PrimUIntMarker: num_traits::PrimInt {}
 
 impl PrimUIntMarker for u8 {}
@@ -112,9 +121,28 @@ impl<T: PrimUIntMarker> TypedOSSLParamData<T> for UIntData<'_> {
     }
 }
 
+/// Converts a raw pointer (`*mut ossl_param_st`) into an `OSSLParam` enum.
 impl TryFrom<*mut OSSL_PARAM> for UIntData<'_> {
     type Error = &'static str;
 
+    /// Converts a raw OpenSSL parameter (`ossl_param_st`) to an `OSSLParam` enum variant.
+    /// Ensures the pointer is not null and that the `data_type` matches an expected OpenSSL parameter type.
+    /// # Examples
+    ///
+    /// ```rust
+    /// use osslparams::OSSLParam;
+    ///
+    /// // Assume we have a raw pointer `param_ptr` of type `*mut ossl_param_st`.
+    /// // For demonstration, we are using a null pointer here:
+    /// let param_ptr: *mut ossl_param_st = std::ptr::null_mut();
+    ///
+    /// // Attempt to convert the pointer into an `OSSLParam`.
+    /// match OSSLParam::try_from(param_ptr) {
+    ///     Ok(param) => println!("Successfully converted to OSSLParam."),
+    ///     Err(e) => println!("Failed to convert: {:?}", e),
+    /// }
+    /// ```
+    ///
     fn try_from(param: *mut OSSL_PARAM) -> Result<Self, Self::Error> {
         match unsafe { param.as_mut() } {
             Some(param) => {
