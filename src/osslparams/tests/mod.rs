@@ -30,7 +30,7 @@ mod generic {
         assert!(result.is_err());
 
         let k = c"test_key";
-        let op_utf8str = OSSLParam::new_const_utf8string(k, c"test_value");
+        let op_utf8str = OSSLParam::new_const_utf8string(k, Some(c"test_value"));
         let t: *const OSSL_PARAM = std::ptr::from_ref(&op_utf8str);
         let result = Utf8StringData::try_from(t as *mut OSSL_PARAM);
         log::debug!("{result:?}");

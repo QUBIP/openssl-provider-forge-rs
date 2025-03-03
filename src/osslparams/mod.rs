@@ -50,60 +50,134 @@ pub enum OSSLParam<'a> {
 
 impl<'a> OSSLParam<'a> {
     /// Creates a new constant OpenSSL parameter with a UTF-8 string pointer.
-    pub fn new_const_utf8ptr(key: &'a KeyType, value: &'a CStr) -> CONST_OSSL_PARAM {
-        let _ = value;
-        let _ = key;
-        todo!()
+    /// Pass None as the value to get a NULL OSSL_PARAM with given key and type
+    pub const fn new_const_utf8ptr(key: &'a KeyType, value: Option<&'a CStr>) -> CONST_OSSL_PARAM {
+        let (data, data_size) = match value {
+            Some(value) => {
+                //let v = value.as_ptr();
+                //let v = v as *mut std::ffi::c_void;
+                //let sz = value.count_bytes();
+
+                //(v, sz)
+                let _ = value;
+                todo!()
+            }
+            None => (std::ptr::null_mut(), 0),
+        };
+
+        CONST_OSSL_PARAM {
+            key: key.as_ptr().cast(),
+            data_type: OSSL_PARAM_UTF8_PTR,
+            data,
+            data_size,
+            return_size: OSSL_PARAM_UNMODIFIED,
+        }
     }
 
     /// Creates a new constant OpenSSL parameter from a UTF-8 string.
-    pub const fn new_const_utf8string(key: &'a KeyType, value: &'a CStr) -> CONST_OSSL_PARAM {
-        let vl = value.count_bytes();
-        let v = value.as_ptr() as *mut std::ffi::c_void;
+    /// Pass None as the value to get a NULL OSSL_PARAM with given key and type
+    pub const fn new_const_utf8string(
+        key: &'a KeyType,
+        value: Option<&'a CStr>,
+    ) -> CONST_OSSL_PARAM {
+        let (data, data_size) = match value {
+            Some(value) => {
+                let v = value.as_ptr();
+                let v = v as *mut std::ffi::c_void;
+                let sz = value.count_bytes();
+
+                (v, sz)
+            }
+            None => (std::ptr::null_mut(), 0),
+        };
+
         CONST_OSSL_PARAM {
             key: key.as_ptr().cast(),
             data_type: OSSL_PARAM_UTF8_STRING,
-            data: v,
-            data_size: vl,
+            data,
+            data_size,
             return_size: OSSL_PARAM_UNMODIFIED,
         }
     }
 
     /// Creates a new constant OpenSSL parameter from an integer value.
-    pub const fn new_const_int<T>(key: &'a KeyType, value: &'a T) -> CONST_OSSL_PARAM
+    /// Pass None as the value to get a NULL OSSL_PARAM with given key and type
+    pub const fn new_const_int<T>(key: &'a KeyType, value: Option<&'a T>) -> CONST_OSSL_PARAM
     where
         T: crate::osslparams::data::int::PrimIntMarker,
     {
-        let v = std::ptr::from_ref(value);
+        let (data, data_size) = match value {
+            Some(value) => {
+                let v = std::ptr::from_ref(value);
+                let v = v as *mut std::ffi::c_void;
+                let sz = size_of::<T>();
+
+                (v, sz)
+            }
+            None => (std::ptr::null_mut(), 0),
+        };
+
         CONST_OSSL_PARAM {
             key: key.as_ptr().cast(),
             data_type: OSSL_PARAM_INTEGER,
-            data: v as *mut std::ffi::c_void,
-            data_size: size_of::<T>(),
+            data,
+            data_size,
             return_size: OSSL_PARAM_UNMODIFIED,
         }
     }
 
     /// Creates a new constant OpenSSL parameter from an unsigned integer value.
-    pub const fn new_const_uint<T>(key: &'a KeyType, value: &'a T) -> CONST_OSSL_PARAM
+    /// Pass None as the value to get a NULL OSSL_PARAM with given key and type
+    pub const fn new_const_uint<T>(key: &'a KeyType, value: Option<&'a T>) -> CONST_OSSL_PARAM
     where
         T: crate::osslparams::data::uint::PrimUIntMarker,
     {
-        let v = std::ptr::from_ref(value);
+        let (data, data_size) = match value {
+            Some(value) => {
+                let v = std::ptr::from_ref(value);
+                let v = v as *mut std::ffi::c_void;
+                let sz = size_of::<T>();
+
+                (v, sz)
+            }
+            None => (std::ptr::null_mut(), 0),
+        };
+
         CONST_OSSL_PARAM {
             key: key.as_ptr().cast(),
             data_type: OSSL_PARAM_UNSIGNED_INTEGER,
-            data: v as *mut std::ffi::c_void,
-            data_size: size_of::<T>(),
+            data: data as *mut std::ffi::c_void,
+            data_size,
             return_size: OSSL_PARAM_UNMODIFIED,
         }
     }
 
     /// Creates a new constant OpenSSL parameter from an octet string.
-    pub fn new_const_octetstring(key: &'a KeyType, value: &'a [i8]) -> CONST_OSSL_PARAM {
-        let _ = key;
-        let _ = value;
-        todo!()
+    /// Pass None as the value to get a NULL OSSL_PARAM with given key and type
+    pub const fn new_const_octetstring(
+        key: &'a KeyType,
+        value: Option<&'a [i8]>,
+    ) -> CONST_OSSL_PARAM {
+        let (data, data_size) = match value {
+            Some(value) => {
+                //let v = std::ptr::from_ref(value);
+                //let _v = v as *mut std::ffi::c_void;
+                //let sz = todo!();
+
+                //(v, sz)
+                let _ = value;
+                todo!()
+            }
+            None => (std::ptr::null_mut(), 0),
+        };
+
+        CONST_OSSL_PARAM {
+            key: key.as_ptr().cast(),
+            data_type: OSSL_PARAM_OCTET_STRING,
+            data,
+            data_size,
+            return_size: OSSL_PARAM_UNMODIFIED,
+        }
     }
 }
 
