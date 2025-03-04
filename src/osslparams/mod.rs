@@ -449,30 +449,38 @@ impl<'a> OSSLParam<'a> {
 /// The `OSSLParamSetter` trait ensures type safety when setting values on `OSSLParam`.
 /// The `set_inner` function verifies the correct variant for type `T` and delegates
 /// the operation to the inner data struct's `set` method.
-pub(crate) trait OSSLParamSetter<T> {
+pub trait OSSLParamSetter<T> {
+    /// The `set_inner` function verifies the correct variant for type `T` and delegates
+    /// the operation to the inner data struct's `set` method.
     fn set_inner(&mut self, value: T) -> Result<(), OSSLParamError>;
 }
+
 /// A trait for safely retrieving type-specific values from the `OSSLParam` enum.
 ///
 /// The `OSSLParamGetter` trait provides a method `get_inner` to extract the inner value.
 /// It returns `Some(T)` if the parameter’s data matches type `T`, otherwise `None`.
-pub(crate) trait OSSLParamGetter<T> {
+pub trait OSSLParamGetter<T> {
+    /// The `get_inner` function extracts the inner value for this type.
+    /// It returns `Some(T)` if the parameter’s data matches type `T`, otherwise `None`.
     fn get_inner(&self) -> Option<T>;
 }
+
 /// A marker trait for types representing OpenSSL parameter data.
 ///
 /// `OSSLParamData` provides a common abstraction for OpenSSL parameter types, allowing the use of trait objects
 /// and simplifying type management. Implemented by all `OSSLParam` data types for consistency and flexibility.
-pub(crate) trait OSSLParamData {
+pub trait OSSLParamData {
+    /// This function returns an OSSLParam of the given type and using the given key, but setting its value to NULL.
     fn new_null(key: &KeyType) -> Self
     where
         Self: Sized;
 }
+
 /// A trait for typed operations on inner OpenSSL parameter data.
 ///
 /// Extends `OSSLParamData` to provide methods for setting values and creating null parameters,
 /// ensuring type-safe manipulation of C struct data for parameters storing specific Rust types.
-pub(crate) trait TypedOSSLParamData<T>: OSSLParamData {
+pub trait TypedOSSLParamData<T>: OSSLParamData {
     /// Sets the value of the parameter to the provided type `T`.
     ///
     /// The `set` function updates the `OSSLParam` to store the given value, adjusting the
