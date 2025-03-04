@@ -121,20 +121,21 @@ impl<T: PrimUIntMarker> TypedOSSLParamData<T> for UIntData<'_> {
     }
 }
 
-/// Converts a raw pointer (`*mut ossl_param_st`) into an `OSSLParam` enum.
+/// Converts a raw pointer (`*mut OSSL_PARAM`) into an `OSSLParam` enum.
 impl TryFrom<*mut OSSL_PARAM> for UIntData<'_> {
     type Error = &'static str;
 
-    /// Converts a raw OpenSSL parameter (`ossl_param_st`) to an `OSSLParam` enum variant.
+    /// Converts a raw OpenSSL parameter (`OSSL_PARAM`) to an `OSSLParam` enum variant.
     /// Ensures the pointer is not null and that the `data_type` matches an expected OpenSSL parameter type.
     /// # Examples
     ///
     /// ```rust
-    /// use osslparams::OSSLParam;
+    /// use openssl_provider_forge::osslparams::OSSLParam;
+    /// use openssl_provider_forge::bindings::OSSL_PARAM;
     ///
-    /// // Assume we have a raw pointer `param_ptr` of type `*mut ossl_param_st`.
+    /// // Assume we have a raw pointer `param_ptr` of type `*mut OSSL_PARAM`.
     /// // For demonstration, we are using a null pointer here:
-    /// let param_ptr: *mut ossl_param_st = std::ptr::null_mut();
+    /// let param_ptr: *mut OSSL_PARAM = std::ptr::null_mut();
     ///
     /// // Attempt to convert the pointer into an `OSSLParam`.
     /// match OSSLParam::try_from(param_ptr) {

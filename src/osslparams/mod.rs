@@ -3,21 +3,15 @@
 //!
 //! It includes various utilities for handling data types such as integers, unsigned integers, and
 //! UTF-8 pointers, enabling type-safe manipulation of OpenSSL parameter structures.
-
-use std::{ffi::CStr, marker::PhantomData};
-
 use crate::bindings::{
     OSSL_PARAM, OSSL_PARAM_INTEGER, OSSL_PARAM_OCTET_STRING, OSSL_PARAM_UNSIGNED_INTEGER,
     OSSL_PARAM_UTF8_PTR, OSSL_PARAM_UTF8_STRING,
 };
-
+use std::{ffi::CStr, marker::PhantomData};
 pub mod data;
-
 #[cfg(test)]
 mod tests;
-
 // List of supported types: https://docs.openssl.org/master/man3/OSSL_PARAM/#supported-types
-
 /// The `OSSLParam` enum represents different parameter data types used by OpenSSL.
 ///
 /// Each variant of `OSSLParam` corresponds to a specific parameter data type and wraps
@@ -47,7 +41,6 @@ pub enum OSSLParam<'a> {
     /// wraps a `OctetStringData` struct that handles the `OctetStringData` data type.
     OctetString(OctetStringData<'a>),
 }
-
 impl<'a> OSSLParam<'a> {
     /// Creates a new constant OpenSSL parameter with a UTF-8 string pointer.
     /// Pass None as the value to get a NULL OSSL_PARAM with given key and type
@@ -57,14 +50,12 @@ impl<'a> OSSLParam<'a> {
                 //let v = value.as_ptr();
                 //let v = v as *mut std::ffi::c_void;
                 //let sz = value.count_bytes();
-
                 //(v, sz)
                 let _ = value;
                 todo!()
             }
             None => (std::ptr::null_mut(), 0),
         };
-
         CONST_OSSL_PARAM {
             key: key.as_ptr().cast(),
             data_type: OSSL_PARAM_UTF8_PTR,
@@ -73,7 +64,6 @@ impl<'a> OSSLParam<'a> {
             return_size: OSSL_PARAM_UNMODIFIED,
         }
     }
-
     /// Creates a new constant OpenSSL parameter from a UTF-8 string.
     /// Pass None as the value to get a NULL OSSL_PARAM with given key and type
     pub const fn new_const_utf8string(
@@ -85,12 +75,10 @@ impl<'a> OSSLParam<'a> {
                 let v = value.as_ptr();
                 let v = v as *mut std::ffi::c_void;
                 let sz = value.count_bytes();
-
                 (v, sz)
             }
             None => (std::ptr::null_mut(), 0),
         };
-
         CONST_OSSL_PARAM {
             key: key.as_ptr().cast(),
             data_type: OSSL_PARAM_UTF8_STRING,
@@ -99,7 +87,6 @@ impl<'a> OSSLParam<'a> {
             return_size: OSSL_PARAM_UNMODIFIED,
         }
     }
-
     /// Creates a new constant OpenSSL parameter from an integer value.
     /// Pass None as the value to get a NULL OSSL_PARAM with given key and type
     pub const fn new_const_int<T>(key: &'a KeyType, value: Option<&'a T>) -> CONST_OSSL_PARAM
@@ -111,12 +98,10 @@ impl<'a> OSSLParam<'a> {
                 let v = std::ptr::from_ref(value);
                 let v = v as *mut std::ffi::c_void;
                 let sz = size_of::<T>();
-
                 (v, sz)
             }
             None => (std::ptr::null_mut(), 0),
         };
-
         CONST_OSSL_PARAM {
             key: key.as_ptr().cast(),
             data_type: OSSL_PARAM_INTEGER,
@@ -125,7 +110,6 @@ impl<'a> OSSLParam<'a> {
             return_size: OSSL_PARAM_UNMODIFIED,
         }
     }
-
     /// Creates a new constant OpenSSL parameter from an unsigned integer value.
     /// Pass None as the value to get a NULL OSSL_PARAM with given key and type
     pub const fn new_const_uint<T>(key: &'a KeyType, value: Option<&'a T>) -> CONST_OSSL_PARAM
@@ -137,12 +121,10 @@ impl<'a> OSSLParam<'a> {
                 let v = std::ptr::from_ref(value);
                 let v = v as *mut std::ffi::c_void;
                 let sz = size_of::<T>();
-
                 (v, sz)
             }
             None => (std::ptr::null_mut(), 0),
         };
-
         CONST_OSSL_PARAM {
             key: key.as_ptr().cast(),
             data_type: OSSL_PARAM_UNSIGNED_INTEGER,
@@ -151,7 +133,6 @@ impl<'a> OSSLParam<'a> {
             return_size: OSSL_PARAM_UNMODIFIED,
         }
     }
-
     /// Creates a new constant OpenSSL parameter from an octet string.
     /// Pass None as the value to get a NULL OSSL_PARAM with given key and type
     pub const fn new_const_octetstring(
@@ -163,14 +144,12 @@ impl<'a> OSSLParam<'a> {
                 //let v = std::ptr::from_ref(value);
                 //let _v = v as *mut std::ffi::c_void;
                 //let sz = todo!();
-
                 //(v, sz)
                 let _ = value;
                 todo!()
             }
             None => (std::ptr::null_mut(), 0),
         };
-
         CONST_OSSL_PARAM {
             key: key.as_ptr().cast(),
             data_type: OSSL_PARAM_OCTET_STRING,
@@ -180,19 +159,16 @@ impl<'a> OSSLParam<'a> {
         }
     }
 }
-
 /// Handles the `Utf8Ptr` data type and contains a field `param`,
 /// which is a `C` structure from OpenSSL using `bindgen`.
 #[derive(Debug)]
 pub struct Utf8PtrData<'a> {
     param: &'a mut OSSL_PARAM,
 }
-
 /// Holds a mutable reference to an OpenSSL `OSSL_PARAM` representing a UTF-8 string.
 pub struct Utf8StringData<'a> {
     param: &'a mut OSSL_PARAM,
 }
-
 impl std::fmt::Debug for Utf8StringData<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let p = OSSLParam::try_from(self.param as *const OSSL_PARAM);
@@ -212,13 +188,11 @@ impl std::fmt::Debug for Utf8StringData<'_> {
         }
     }
 }
-
 /// Handles the `Integer` data type and contains a field `param`,
 /// which is a `C` structure from OpenSSL using `bindgen`.
 pub struct IntData<'a> {
     param: &'a mut OSSL_PARAM,
 }
-
 impl std::fmt::Debug for IntData<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let p = OSSLParam::try_from(self.param as *const OSSL_PARAM);
@@ -238,13 +212,11 @@ impl std::fmt::Debug for IntData<'_> {
         }
     }
 }
-
 /// This Rust structure handles `Unsigned Integer` data type and contains a single field `param`
 /// which is actually a `C` structure coming from OpenSSL using `bindgen`.
 pub struct UIntData<'a> {
     param: &'a mut OSSL_PARAM,
 }
-
 impl std::fmt::Debug for UIntData<'_> {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         let p = OSSLParam::try_from(self.param as *const OSSL_PARAM);
@@ -264,33 +236,38 @@ impl std::fmt::Debug for UIntData<'_> {
         }
     }
 }
-
 #[derive(Debug)]
 /// Holds a mutable reference to an OpenSSL `OSSL_PARAM` representing an octet string.
 pub struct OctetStringData<'a> {
     param: &'a mut OSSL_PARAM,
 }
-
 /// A type alias for errors related to OpenSSL parameters.
 ///
 /// `OSSLParamError` is represented by a `String`, typically used for returning
 /// descriptive error messages in operations involving `OSSLParam`.
 pub type OSSLParamError = String;
-
-/// A type alias for keys used in OpenSSL parameters.
+/// This is the type used by OpenSSL bindings to represent the `key` field of an `OSSL_PARAM`.
 ///
-/// `KeyType` is represented by [`CStr`], which provides an interface to C-style strings.
+/// `KeyType` is represented as [`CStr`] (which provides a Rust interface to C-style strings).
 ///
 /// # Examples
 ///
 /// ```rust
-/// use rust_openssl_core_provider::osslparams::KeyType;
-/// use std::ffi::CStr;
+/// use openssl_provider_forge::bindings;
+/// use openssl_provider_forge::osslparams::{KeyType, OSSLParam, CONST_OSSL_PARAM};
 ///
-/// let key: KeyType = CStr::c"my_key".unwrap();
+/// // Define 2 keys, one from the OpenSSL bindings, one arbitrarily defined
+/// let key_1: &KeyType = bindings::OSSL_PROV_PARAM_STATUS;
+/// let key_2: &KeyType = c"My_arbitrary_key_name";
+///
+/// // Create a params list with the keys defined above
+/// let params = [
+///     OSSLParam::new_const_int(key_1, Some(&1)),
+///     OSSLParam::new_const_int(key_2, Some(&42)),
+///     CONST_OSSL_PARAM::END
+/// ];
 /// ```
 pub type KeyType = CStr;
-
 impl<'a> OSSLParam<'a> {
     /// Sets the value of the parameter to the provided type `T`.
     ///
@@ -304,7 +281,6 @@ impl<'a> OSSLParam<'a> {
     {
         self.set_inner(value)
     }
-
     /// Extracts the inner value from `OSSLParam` if it matches the expected type.
     ///
     /// The `get` function acts as a convenience wrapper around `get_inner`, providing
@@ -314,6 +290,17 @@ impl<'a> OSSLParam<'a> {
     /// # Examples
     ///
     /// ```rust
+    /// use openssl_provider_forge::osslparams::*;
+    /// use openssl_provider_forge::bindings::OSSL_PARAM;
+    ///
+    /// # let my_external_param = OSSLParam::new_const_int(c"arbitrary_key", Some(&42));
+    /// # let EXTERNAL_OSSL_PARAM_PTR: *const OSSL_PARAM = std::ptr::from_ref(&my_external_param).cast();
+    /// // EXTERNAL_OSSL_PARAM_PTR is a `*OSSL_PARAM`, from which
+    /// // we create a "rich" OSSLParam Rust object (i.e., `my_param`).
+    /// // We can then safely manipulate `my_param` using Rust methods.
+    /// let my_param = OSSLParam::try_from(EXTERNAL_OSSL_PARAM_PTR).unwrap();
+    ///
+    /// // Assuming the external OSSL_PARAM had `int` type, the following would retrieve the value.
     /// if let Some(value) = my_param.get::<i64>() {
     ///     println!("The value is: {}", value);
     /// }
@@ -325,7 +312,6 @@ impl<'a> OSSLParam<'a> {
     {
         self.get_inner()
     }
-
     /// Retrieves the `param` field from the inner data of the `OSSLParam` enum, regardless of its variant.
     ///
     /// The `get_c_struct` function retrieves the `param`field from the inner data of enum,
@@ -334,9 +320,15 @@ impl<'a> OSSLParam<'a> {
     /// # Examples
     ///
     /// ```rust
-    /// let param = OSSLParam::Int(42);
-    /// let inner_param = param.get_c_struct();
-    /// println!("Retrieved param: {:?}", inner_param);
+    /// # use openssl_provider_forge::osslparams::*;
+    /// let p = OSSLParam::new_const_int(c"a_key", Some(&42));
+    /// let param = OSSLParam::try_from(&p).unwrap();
+    /// let ffi_param = param.get_c_struct();
+    /// println!("Retrieved param: {:?}", ffi_param);
+    ///
+    /// let rich_type = OSSLParam::try_from(ffi_param).unwrap();
+    /// assert_eq!(rich_type.get_key(), Some(c"a_key")); // same as the key defined when `p` was declared
+    /// assert_eq!(rich_type.get(), Some(42)); // same as the value defined when `p` was declared
     /// ```
     ///
     pub fn get_c_struct(&self) -> *const OSSL_PARAM {
@@ -348,7 +340,6 @@ impl<'a> OSSLParam<'a> {
             OSSLParam::OctetString(d) => d.param,
         }
     }
-
     /// Returns a mutable pointer to the underlying OpenSSL `OSSL_PARAM` structure,
     /// allowing direct modification of the parameter in OpenSSL operations.
     pub fn get_c_struct_mut(&mut self) -> *mut OSSL_PARAM {
@@ -360,15 +351,26 @@ impl<'a> OSSLParam<'a> {
             OSSLParam::OctetString(d) => d.param,
         }
     }
-
     /// Retrieves the key associated with the `OSSLParam` as a reference to `KeyType`.
     ///
     /// The `get_key`function retrieves the key associated with the `OSSLParam` as a reference to `KeyType`.
+    ///
     /// # Examples
     ///
     /// ```rust
+    /// use openssl_provider_forge::osslparams::*;
+    /// use openssl_provider_forge::bindings::OSSL_PARAM;
+    ///
+    /// # let my_external_param = OSSLParam::new_const_int(c"arbitrary_key", Some(&42));
+    /// # let EXTERNAL_OSSL_PARAM_PTR: *const OSSL_PARAM = std::ptr::from_ref(&my_external_param).cast();
+    /// // EXTERNAL_OSSL_PARAM_PTR is a `*OSSL_PARAM`, from which
+    /// // we create a "rich" OSSLParam Rust object (i.e., `my_param`).
+    /// // We can then safely manipulate `my_param` using Rust methods.
+    /// let my_param = OSSLParam::try_from(EXTERNAL_OSSL_PARAM_PTR).unwrap();
+    ///
     /// let key = my_param.get_key();
     /// println!("Retrieved key: {:?}", key);
+    /// assert_eq!(key, Some(c"arbitrary_key"));
     /// ```
     pub fn get_key(&self) -> Option<&KeyType> {
         let cptr: *const OSSL_PARAM = self.get_c_struct();
@@ -382,16 +384,13 @@ impl<'a> OSSLParam<'a> {
         let k = unsafe { CStr::from_ptr(r.key) };
         Some(k)
     }
-
     /// Returns the data type of the underlying OpenSSL `OSSL_PARAM` structure.
     pub fn get_data_type(&self) -> Option<u32> {
         let cptr: *const OSSL_PARAM = self.get_c_struct();
         let r = &(unsafe { *cptr });
         Some(r.data_type)
     }
-
     // corresponds to OSSL_PARAM_modified()
-
     /// Checks if the parameter has been modified.
     ///
     /// The `modified` function checks if the parameter represented by the `OSSLParam` has been set,
@@ -401,16 +400,15 @@ impl<'a> OSSLParam<'a> {
     pub fn modified(&mut self) -> bool {
         unsafe { (*self.get_c_struct()).return_size != OSSL_PARAM_UNMODIFIED }
     }
-
+    // this function is not `pub` so its documentation is not rendered normally
     // right now this method is just here to show we can return &dyn OSSLParamData if we need it
-
     /// Returns a reference to the inner content of any `OSSLParam` variant through a common interface.
     ///
     /// The `inner_data` function returns a reference to the inner data of the `OSSLParam` enum as a `&dyn`.
     ///
     /// # Examples
     ///
-    /// ```rust
+    /// ```ignore
     /// let param = OSSLParam::Int(42);
     /// let data = param.inner_data();
     /// // `data` can now be used via the `OSSLParamData` trait.
@@ -433,7 +431,7 @@ impl<'a> OSSLParam<'a> {
     ///
     /// # Examples
     ///
-    /// ```rust
+    /// ```ignore
     /// let param = OSSLParam::Int(42);
     /// let variant = param.variant_name();
     /// println!("Variant name: {}", variant); // Outputs: "Int"
@@ -446,92 +444,35 @@ impl<'a> OSSLParam<'a> {
             .to_owned()
     }
 }
-
 /// A trait for setting type-safe values on the inner data of an `OSSLParam` enum.
 ///
 /// The `OSSLParamSetter` trait ensures type safety when setting values on `OSSLParam`.
 /// The `set_inner` function verifies the correct variant for type `T` and delegates
 /// the operation to the inner data struct's `set` method.
-pub trait OSSLParamSetter<T> {
-    /// Sets the value of the parameter if it matches the correct variant.
-    ///
-    /// Matches the `OSSLParam` variant (e.g., `Utf8Ptr`, `Int`, `UInt`) and sets the value if the type matches.
-    /// Returns `Ok(c_int)` on success, or `Err(String)` if the type does not match.
-    ///
-    /// # Examples
-    ///
-    /// ```rust
-    /// let mut param = OSSLParam::Int(0);
-    /// match param.set_inner(100) {
-    ///     Ok(_) => println!("Value set successfully."),
-    ///     Err(e) => println!("Failed to set value: {}", e),
-    /// }
-    /// ```
+pub(crate) trait OSSLParamSetter<T> {
     fn set_inner(&mut self, value: T) -> Result<(), OSSLParamError>;
 }
-
 /// A trait for safely retrieving type-specific values from the `OSSLParam` enum.
 ///
 /// The `OSSLParamGetter` trait provides a method `get_inner` to extract the inner value.
 /// It returns `Some(T)` if the parameter’s data matches type `T`, otherwise `None`.
-pub trait OSSLParamGetter<T> {
-    /// Retrieves the inner value if the `OSSLParam` variant matches.
-    ///
-    /// The `get_inner` function extracts the inner value if the `OSSLParam` matches the
-    /// expected variant (e.g., `Int`, `UInt`, `Utf8Ptr`). Returns `Some(T)` if the type matches,
-    /// otherwise returns `None`
-    ///
-    /// # Examples
-    ///
-    /// ```rust
-    /// let param = MyParam::Int(42);
-    ///
-    /// if let Some(value) = param.get_inner() {
-    ///     println!("Retrieved value: {}", value);
-    /// } else {
-    ///     println!("The type did not match or could not retrieve value.");
-    /// }
-    /// ```
-    ///
+pub(crate) trait OSSLParamGetter<T> {
     fn get_inner(&self) -> Option<T>;
 }
-
 /// A marker trait for types representing OpenSSL parameter data.
 ///
 /// `OSSLParamData` provides a common abstraction for OpenSSL parameter types, allowing the use of trait objects
 /// and simplifying type management. Implemented by all `OSSLParam` data types for consistency and flexibility.
-pub trait OSSLParamData {
-    /// Creates a new instance of the parameter with default or null values.
-    ///
-    /// This function initializes an `OSSLParam` with default values that represent an uninitialized or null state.
-    /// It is useful when a parameter needs to be created without an initial value, allowing it to be set later.
-    /// # Examples
-    ///
-    /// ```rust
-    /// // Assume KeyType is some type that represents a key for the parameter.
-    /// let key: KeyType = KeyType::new("example_key");
-    ///
-    /// // Create a new instance of OSSLParam with a null value.
-    /// let param = OSSLParam::new_null(&key);
-    ///
-    /// // The `param` is now initialized with a null value, ready to be assigned later.
-    /// println!("Parameter with key '{}' created with null value.", key);
-    /// ```
-    ///
-    /// # Explanation
-    /// - The `new_null` function takes a reference to a `KeyType` as input and uses it to initialize the `param` field.
-    /// - It creates an instance of `IntData` (or any other relevant data type) with `data` set to null (`std::ptr::null()`).
-    /// - This means the parameter is created but has no initial data assigned—it's essentially a placeholder.
+pub(crate) trait OSSLParamData {
     fn new_null(key: &KeyType) -> Self
     where
         Self: Sized;
 }
-
 /// A trait for typed operations on inner OpenSSL parameter data.
 ///
 /// Extends `OSSLParamData` to provide methods for setting values and creating null parameters,
 /// ensuring type-safe manipulation of C struct data for parameters storing specific Rust types.
-pub trait TypedOSSLParamData<T>: OSSLParamData {
+pub(crate) trait TypedOSSLParamData<T>: OSSLParamData {
     /// Sets the value of the parameter to the provided type `T`.
     ///
     /// The `set` function updates the `OSSLParam` to store the given value, adjusting the
@@ -540,7 +481,6 @@ pub trait TypedOSSLParamData<T>: OSSLParamData {
     /// is `NULL` or the conversion fails, an appropriate error is returned.
     fn set(&mut self, value: T) -> Result<(), OSSLParamError>;
 }
-
 macro_rules! setter_type_err_string {
     ($param:expr, $value:ident) => {
         format!(
@@ -550,9 +490,7 @@ macro_rules! setter_type_err_string {
         )
     };
 }
-
 pub(crate) use setter_type_err_string;
-
 macro_rules! new_null_param {
     ($constructor:ident, $data_type:ident, $key:expr) => {
         $constructor {
@@ -566,9 +504,7 @@ macro_rules! new_null_param {
         }
     };
 }
-
 pub(crate) use new_null_param;
-
 macro_rules! impl_setter {
     ($t:ty, $variant:ident) => {
         impl<'a> $crate::osslparams::OSSLParamSetter<$t> for OSSLParam<'a> {
@@ -582,33 +518,41 @@ macro_rules! impl_setter {
         }
     };
 }
-
 pub(crate) use impl_setter;
-
 impl<'a> TryFrom<&mut OSSL_PARAM> for OSSLParam<'a> {
     type Error = OSSLParamError;
-
     fn try_from(value: &mut OSSL_PARAM) -> Result<Self, Self::Error> {
         OSSLParam::try_from(value as *mut OSSL_PARAM)
     }
 }
-
-/// Converts a raw pointer (`*mut ossl_param_st`) into an `OSSLParam` enum.
+impl<'a> TryFrom<&CONST_OSSL_PARAM> for OSSLParam<'a> {
+    type Error = OSSLParamError;
+    fn try_from(value: &CONST_OSSL_PARAM) -> Result<Self, Self::Error> {
+        let ptr = std::ptr::from_ref(value);
+        OSSLParam::try_from(ptr as *mut OSSL_PARAM)
+    }
+}
+/// Converts a raw pointer (`*mut OSSL_PARAM`) into an `OSSLParam` enum.
 impl<'a> TryFrom<*mut OSSL_PARAM> for OSSLParam<'a> {
     type Error = OSSLParamError;
-
     /// Ensures the pointer is not null and that the `data_type` matches an expected OpenSSL parameter type.
+    ///
     /// # Examples
     ///
     /// ```rust
-    /// use osslparams::OSSLParam;
+    /// use openssl_provider_forge::bindings::OSSL_PARAM;
+    /// use openssl_provider_forge::osslparams::OSSLParam;
     ///
-    /// // Assume we have a raw pointer `param_ptr` of type `*mut ossl_param_st`.
+    /// // Assume we have a raw pointer `param_ptr` of type `*mut OSSL_PARAM`.
     /// // For demonstration, we are using a null pointer here:
-    /// let param_ptr: *mut ossl_param_st = std::ptr::null_mut();
+    /// let param_ptr: *mut OSSL_PARAM = std::ptr::null_mut();
     ///
     /// // Attempt to convert the pointer into an `OSSLParam`.
-    /// match OSSLParam::try_from(param_ptr) {
+    /// let ret = OSSLParam::try_from(param_ptr);
+    ///
+    /// assert!(ret.is_err()); // should fail because cannot convert from a null pointer
+    ///
+    /// match ret {
     ///     Ok(param) => println!("Successfully converted to OSSLParam."),
     ///     Err(e) => println!("Failed to convert: {:?}", e),
     /// }
@@ -636,16 +580,13 @@ impl<'a> TryFrom<*mut OSSL_PARAM> for OSSLParam<'a> {
         }
     }
 }
-
 impl<'a> TryFrom<*const OSSL_PARAM> for OSSLParam<'a> {
     type Error = OSSLParamError;
-
     fn try_from(p: *const OSSL_PARAM) -> std::result::Result<Self, Self::Error> {
         let m = p as *mut OSSL_PARAM;
         OSSLParam::try_from(m)
     }
 }
-
 impl<'a> From<&mut OSSLParam<'a>> for *mut OSSL_PARAM {
     fn from(val: &mut OSSLParam<'a>) -> Self {
         match val {
@@ -657,7 +598,6 @@ impl<'a> From<&mut OSSLParam<'a>> for *mut OSSL_PARAM {
         }
     }
 }
-
 impl<'a> From<&OSSLParam<'a>> for *const OSSL_PARAM {
     fn from(val: &OSSLParam<'a>) -> Self {
         match val {
@@ -669,19 +609,16 @@ impl<'a> From<&OSSLParam<'a>> for *const OSSL_PARAM {
         }
     }
 }
-
 impl<'a> From<OSSLParam<'a>> for *mut OSSL_PARAM {
     fn from(mut val: OSSLParam<'a>) -> Self {
         (&mut val).into()
     }
 }
-
 impl<'a> From<OSSLParam<'a>> for *const OSSL_PARAM {
     fn from(val: OSSLParam<'a>) -> Self {
         (&val).into()
     }
 }
-
 impl OSSL_PARAM {
     /// Represents the end marker for an OpenSSL parameter list.
     pub const END: Self = Self {
@@ -692,29 +629,12 @@ impl OSSL_PARAM {
         return_size: 0,
     };
 }
-
 /// Provides an end-of-parameter list marker for `OSSL_PARAM` arrays.
 /// Used to terminate `OSSL_PARAM` arrays, indicating the end of the parameter list.
-///
-/// # Examples
-///
-/// ```rust
-/// // Creating an array of `OSSL_PARAM` with a termination marker.
-/// let params = [
-///     OSSLParam::Int(42),
-///     OSSLParam::Utf8Ptr("example_key".to_string()),
-///     OSSL_PARAM_END, // Marks the end of the parameter list.
-/// ];
-///
-/// // The `OSSL_PARAM_END` signals the end of the parameters, ensuring correct handling.
-/// assert_eq!(params[2].key, std::ptr::null());
-/// ```
 pub const OSSL_PARAM_END: OSSL_PARAM = OSSL_PARAM::END;
-
 /// A single-element array containing the `OSSL_PARAM_END` marker.
 /// Used to represent an empty parameter list in OpenSSL operations.
 pub const EMPTY_PARAMS: [OSSL_PARAM; 1] = [OSSL_PARAM_END];
-
 /*
  * core::ffi:c_size_t is only in nightly, and unstable
  *
@@ -725,14 +645,18 @@ pub const EMPTY_PARAMS: [OSSL_PARAM; 1] = [OSSL_PARAM_END];
  */
 // const OSSL_PARAM_UNMODIFIED: usize = core::ffi::c_size_t::MAX;
 const OSSL_PARAM_UNMODIFIED: usize = usize::MAX;
-
 /// An iterator over a sequence of OpenSSL `OSSL_PARAM` structures.
 /// Allows traversal of parameters using a raw pointer, with lifetime tracking via `PhantomData`.
+///
+/// # Examples
+///
+/// ```ignore
+/// TODO(Akif): there should be an example of how a user of this crate can get and use a OSSLParamIterator
+/// ```
 pub struct OSSLParamIterator<'a> {
     ptr: *mut OSSL_PARAM,
     phantom: PhantomData<OSSLParam<'a>>,
 }
-
 impl OSSLParamIterator<'_> {
     fn new(ptr: *const OSSL_PARAM) -> Self {
         OSSLParamIterator {
@@ -741,10 +665,8 @@ impl OSSLParamIterator<'_> {
         }
     }
 }
-
 impl<'a> Iterator for OSSLParamIterator<'a> {
     type Item = OSSLParam<'a>;
-
     fn next(&mut self) -> Option<Self::Item> {
         match unsafe { self.ptr.as_ref() } {
             Some(p) => {
@@ -760,26 +682,28 @@ impl<'a> Iterator for OSSLParamIterator<'a> {
         }
     }
 }
-
 impl<'a> IntoIterator for OSSLParam<'a> {
     type Item = Self;
-
     type IntoIter = OSSLParamIterator<'a>;
-
     fn into_iter(self) -> Self::IntoIter {
         OSSLParamIterator::new(self.get_c_struct())
     }
 }
-
-#[repr(C)]
-#[derive(Debug, Copy, Clone)]
-#[allow(non_camel_case_types)]
-
 /// This struct holds a key-value pair along with metadata describing the parameter's type,
 /// size, and the memory location of the data.
 /// It is commonly used when interacting with OpenSSL APIs that require parameter lists.
+///
+/// NOTE: This has exactly the same C representation as bindings::OSSL_PARAM but we
+/// explicitly implement Send and Sync traits for it, as we only represent immutable static
+/// params with this type which are safe to be passed around threads (as they
+/// can never be written at runtime, but only read)
+///
+/// todo (copy doc from https://docs.openssl.org/master/man3/OSSL_PARAM/)
+#[repr(C)]
+#[derive(Debug, Copy, Clone)]
+#[allow(non_camel_case_types)]
 pub struct CONST_OSSL_PARAM {
-    /// A pointer to a C-style string representing the parameter's key.
+    /// name of the parameter.
     pub key: *const ::std::os::raw::c_char,
     /// The type of the data (e.g., string, integer) represented by the parameter.
     pub data_type: ::std::os::raw::c_uint,
@@ -790,25 +714,20 @@ pub struct CONST_OSSL_PARAM {
     /// The size of the data returned after the operation, typically used for output buffers.
     pub return_size: usize,
 }
-
 // SAFETY: This is only valid if the C API guarantees that the data pointed by the inner pointers is actually immutable and thread-safe.
 unsafe impl Send for CONST_OSSL_PARAM {}
 unsafe impl Sync for CONST_OSSL_PARAM {}
-
 impl std::ops::Deref for CONST_OSSL_PARAM {
-    type Target = crate::bindings::ossl_param_st;
-
+    type Target = OSSL_PARAM;
     fn deref(&self) -> &Self::Target {
         unsafe { &*(self as *const Self as *const Self::Target) }
     }
 }
-
-impl From<&CONST_OSSL_PARAM> for *const crate::bindings::ossl_param_st {
+impl From<&CONST_OSSL_PARAM> for *const OSSL_PARAM {
     fn from(param: &CONST_OSSL_PARAM) -> Self {
         param as *const CONST_OSSL_PARAM as *const OSSL_PARAM
     }
 }
-
 impl CONST_OSSL_PARAM {
     /// Represents the end marker for OpenSSL parameters.
     pub const END: Self = Self {
