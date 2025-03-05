@@ -296,6 +296,7 @@ impl<'a> OSSLParam<'a> {
     {
         self.set_inner(value)
     }
+
     /// Extracts the inner value from `OSSLParam` if it matches the expected type.
     ///
     /// The `get` function acts as a convenience wrapper around `get_inner`, providing
@@ -327,6 +328,7 @@ impl<'a> OSSLParam<'a> {
     {
         self.get_inner()
     }
+
     /// Retrieves the `param` field from the inner data of the `OSSLParam` enum, regardless of its variant.
     ///
     /// The `get_c_struct` function retrieves the `param`field from the inner data of enum,
@@ -355,6 +357,7 @@ impl<'a> OSSLParam<'a> {
             OSSLParam::OctetString(d) => d.param,
         }
     }
+
     /// Returns a mutable pointer to the underlying OpenSSL `OSSL_PARAM` structure,
     /// allowing direct modification of the parameter in OpenSSL operations.
     pub fn get_c_struct_mut(&mut self) -> *mut OSSL_PARAM {
@@ -366,6 +369,7 @@ impl<'a> OSSLParam<'a> {
             OSSLParam::OctetString(d) => d.param,
         }
     }
+
     /// Retrieves the key associated with the `OSSLParam` as a reference to `KeyType`.
     ///
     /// The `get_key`function retrieves the key associated with the `OSSLParam` as a reference to `KeyType`.
@@ -399,12 +403,14 @@ impl<'a> OSSLParam<'a> {
         let k = unsafe { CStr::from_ptr(r.key) };
         Some(k)
     }
+
     /// Returns the data type of the underlying OpenSSL `OSSL_PARAM` structure.
     pub fn get_data_type(&self) -> Option<u32> {
         let cptr: *const OSSL_PARAM = self.get_c_struct();
         let r = &(unsafe { *cptr });
         Some(r.data_type)
     }
+
     // corresponds to OSSL_PARAM_modified()
     /// Checks if the parameter has been modified.
     ///
@@ -690,9 +696,55 @@ const OSSL_PARAM_UNMODIFIED: usize = usize::MAX;
 ///
 /// # Examples
 ///
-/// ```ignore
-/// TODO(Akif): there should be an example of how a user of this crate can get and use a OSSLParamIterator
+/// ```rust
+/// use openssl_provider_forge::osslparams::{OSSLParam, OSSLParamIterator, CONST_OSSL_PARAM, OSSLParamGetter};
+/// use std::ffi::CStr;
+///
+/// // NOTE: it's very important valid lists of parameters are ALWAYS terminated by END item
+/// let params_list = [
+///     OSSLParam::new_const_int(c"foo", Some(&1i32)),
+///     OSSLParam::new_const_uint(c"bar", Some(&42u64)),
+///     OSSLParam::new_const_utf8string(c"baz", Some(c"a string")),
+///     CONST_OSSL_PARAM::END
+/// ];
+///
+/// let first = params_list.first().unwrap();
+/// let p = OSSLParam::try_from(first).unwrap();
+///
+/// // here we explicitly get an OSSLParamIterator,
+/// // but we can also directly iterate over
+/// // an OSSLParam as it implements IntoIterator:
+/// // e.g., `for i in p { todo!("do something with _i_"); }`.
+/// let iterator: OSSLParamIterator = p.into_iter();
+///
+/// let mut counter = 0;
+/// for i in iterator {
+///     let key = i.get_key();
+///     assert!(key.is_some());
+///
+///     match counter {
+///         0 => {
+///             assert_eq!(key, Some(c"foo"));
+///             assert_eq!(i.get::<i32>(), Some(1));
+///         },
+///         1 => {
+///             assert_eq!(key, Some(c"bar"));
+///             assert_eq!(i.get::<u64>(), Some(42));
+///         },
+///         2 => {
+///             assert_eq!(key, Some(c"baz"));
+///             assert_eq!(i.get::<&CStr>(), Some(c"a string"));
+///         },
+///         _ => unreachable!(),
+///     }
+///     counter = counter + 1;
+/// }
+///
+/// assert_eq!(counter, 3);
+/// assert_eq!(counter, params_list.len() - 1 );
+///
 /// ```
+///
 pub struct OSSLParamIterator<'a> {
     ptr: *mut OSSL_PARAM,
     phantom: PhantomData<OSSLParam<'a>>,
@@ -709,6 +761,7 @@ impl OSSLParamIterator<'_> {
 
 impl<'a> Iterator for OSSLParamIterator<'a> {
     type Item = OSSLParam<'a>;
+
     fn next(&mut self) -> Option<Self::Item> {
         match unsafe { self.ptr.as_ref() } {
             Some(p) => {
@@ -725,9 +778,57 @@ impl<'a> Iterator for OSSLParamIterator<'a> {
     }
 }
 
+/// OSSLParam implements IntoIterator, so it is possible to directly do a
+/// for loop given an OSSLParam variable.
+///
+/// # Example
+///
+/// ```rust
+/// use openssl_provider_forge::osslparams::{OSSLParam, CONST_OSSL_PARAM, OSSLParamGetter};
+/// use std::ffi::CStr;
+///
+/// // NOTE: it's very important valid lists of parameters are ALWAYS terminated by END item
+/// let params_list = [
+///     OSSLParam::new_const_int(c"foo", Some(&1i32)),
+///     OSSLParam::new_const_uint(c"bar", Some(&42u64)),
+///     OSSLParam::new_const_utf8string(c"baz", Some(c"a string")),
+///     CONST_OSSL_PARAM::END
+/// ];
+///
+/// let params = OSSLParam::try_from(&params_list[0]).unwrap();
+///
+/// let mut counter = 0;
+/// for p in params {
+///     let key = p.get_key();
+///     assert!(key.is_some());
+///
+///     match counter {
+///         0 => {
+///             assert_eq!(key, Some(c"foo"));
+///             assert_eq!(p.get::<i32>(), Some(1));
+///         },
+///         1 => {
+///             assert_eq!(key, Some(c"bar"));
+///             assert_eq!(p.get::<u64>(), Some(42));
+///         },
+///         2 => {
+///             assert_eq!(key, Some(c"baz"));
+///             assert_eq!(p.get::<&CStr>(), Some(c"a string"));
+///         },
+///         _ => unreachable!(),
+///     }
+///     counter = counter + 1;
+/// }
+///
+/// assert_eq!(counter, 3);
+/// assert_eq!(counter, params_list.len() - 1 );
+///
+/// ```
+///
 impl<'a> IntoIterator for OSSLParam<'a> {
     type Item = Self;
     type IntoIter = OSSLParamIterator<'a>;
+
     fn into_iter(self) -> Self::IntoIter {
         OSSLParamIterator::new(self.get_c_struct())
     }
@@ -737,12 +838,16 @@ impl<'a> IntoIterator for OSSLParam<'a> {
 /// size, and the memory location of the data.
 /// It is commonly used when interacting with OpenSSL APIs that require parameter lists.
 ///
-/// NOTE: This has exactly the same C representation as bindings::OSSL_PARAM but we
+/// # NOTE
+///
+/// This has exactly the same C representation as bindings::OSSL_PARAM but we
 /// explicitly implement Send and Sync traits for it, as we only represent immutable static
 /// params with this type which are safe to be passed around threads (as they
 /// can never be written at runtime, but only read)
 ///
-/// todo (copy doc from https://docs.openssl.org/master/man3/OSSL_PARAM/)
+/// # 🔧 **TODO**
+///
+/// - [ ] copy doc from <https://docs.openssl.org/master/man3/OSSL_PARAM/> for each field
 #[repr(C)]
 #[derive(Debug, Copy, Clone)]
 #[allow(non_camel_case_types)]
@@ -765,6 +870,7 @@ unsafe impl Sync for CONST_OSSL_PARAM {}
 
 impl std::ops::Deref for CONST_OSSL_PARAM {
     type Target = OSSL_PARAM;
+
     fn deref(&self) -> &Self::Target {
         unsafe { &*(self as *const Self as *const Self::Target) }
     }
