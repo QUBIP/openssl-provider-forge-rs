@@ -421,31 +421,7 @@ impl<'a> OSSLParam<'a> {
     pub fn modified(&mut self) -> bool {
         unsafe { (*self.get_c_struct()).return_size != OSSL_PARAM_UNMODIFIED }
     }
-    // this function is not `pub` so its documentation is not rendered normally
-    // right now this method is just here to show we can return &dyn OSSLParamData if we need it
-    /// Returns a reference to the inner content of any `OSSLParam` variant through a common interface.
-    ///
-    /// The `inner_data` function returns a reference to the inner data of the `OSSLParam` enum as a `&dyn`.
-    ///
-    /// # Examples
-    ///
-    /// ```ignore
-    /// let param = OSSLParam::Int(42);
-    /// let data = param.inner_data();
-    /// // `data` can now be used via the `OSSLParamData` trait.
-    /// println!("Accessed inner data: {:?}", data);
-    /// ```
-    ///
-    #[allow(dead_code)]
-    fn inner_data(&self) -> &dyn OSSLParamData {
-        match self {
-            OSSLParam::Utf8Ptr(d) => d,
-            OSSLParam::Utf8String(d) => d,
-            OSSLParam::Int(d) => d,
-            OSSLParam::UInt(d) => d,
-            OSSLParam::OctetString(d) => d,
-        }
-    }
+
     /// Retrieves the name of the enum variant as a `String`.
     ///
     /// Provides the name of the current variant, such as `"Int"` for `OSSLParam::Int`.
