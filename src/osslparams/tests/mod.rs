@@ -45,4 +45,65 @@ mod generic {
         assert_eq!(op.get_key().unwrap(), k);
         assert_eq!(op.get::<&CStr>(), Some(c"test_value"));
     }
+
+    #[test]
+    /// This tests duplicates an `ignored` doctest in the documentation for variant_name()
+    ///
+    /// variant_name() is a private method, so we cannot test it in doctests, but we want
+    /// to keep there a valid example, therefore we test it here.
+    ///
+    /// If this test breaks, please fix also the corresponding example in the doccomment.
+    fn test_variant_name_simple() {
+        let param = OSSLParam::new_const_int(c"some_key", Some(&42i64));
+        let param: OSSLParam = OSSLParam::try_from(&param).unwrap();
+
+        let variant = param.variant_name();
+
+        println!("Variant name: {}", variant); // Outputs: "Int"
+        assert_eq!(variant, "Int");
+    }
+
+    #[test]
+    /// This tests duplicates an `ignored` doctest in the documentation for variant_name()
+    ///
+    /// variant_name() is a private method, so we cannot test it in doctests, but we want
+    /// to keep there a valid example, therefore we test it here.
+    ///
+    /// If this test breaks, please fix also the corresponding example in the doccomment.
+    fn test_variant_name_list() {
+        // NOTE: it's very important valid lists of parameters are ALWAYS terminated by END item
+        let params_list = [
+            OSSLParam::new_const_int(c"foo", Some(&1i32)), // This is an Int
+            OSSLParam::new_const_uint(c"bar", Some(&42u64)), // This is a UInt
+            OSSLParam::new_const_utf8string(c"baz", Some(c"a string")), // This is a Utf8String
+            CONST_OSSL_PARAM::END,
+        ];
+
+        let params = OSSLParam::try_from(&params_list[0]).unwrap();
+
+        let mut counter = 0;
+        for p in params {
+            let key = p.get_key();
+            assert!(key.is_some());
+
+            let variant = p.variant_name();
+
+            match counter {
+                0 => {
+                    assert_eq!(variant, "Int");
+                }
+                1 => {
+                    assert_eq!(variant, "UInt");
+                }
+                2 => {
+                    assert_eq!(variant, "Utf8String");
+                }
+                _ => unreachable!(),
+            }
+            counter = counter + 1;
+        }
+
+        assert_eq!(counter, 3);
+        assert_eq!(counter, params_list.len() - 1);
+    }
 }
