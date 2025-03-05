@@ -417,7 +417,6 @@ impl<'a> OSSLParam<'a> {
     /// The `modified` function checks if the parameter represented by the `OSSLParam` has been set,
     /// by inspecting the `return_size` field of the underlying C struct. If the `return_size` differs
     /// from the constant `OSSL_PARAM_UNMODIFIED`, the parameter is considered to have been modified.
-    #[allow(dead_code)]
     pub fn modified(&mut self) -> bool {
         unsafe { (*self.get_c_struct()).return_size != OSSL_PARAM_UNMODIFIED }
     }
