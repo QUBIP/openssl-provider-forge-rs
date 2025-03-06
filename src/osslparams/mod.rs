@@ -4,11 +4,17 @@
 //!
 //! [OSSL_PARAM(3ossl)]: https://docs.openssl.org/master/man3/OSSL_PARAM/
 
-use crate::bindings::{
-    OSSL_PARAM, OSSL_PARAM_INTEGER, OSSL_PARAM_OCTET_STRING, OSSL_PARAM_UNSIGNED_INTEGER,
-    OSSL_PARAM_UTF8_PTR, OSSL_PARAM_UTF8_STRING,
-};
 use std::{ffi::CStr, marker::PhantomData};
+
+// We re-export related definitions from the FFI bindings, as they are generally
+// of use to users of this module.
+pub use crate::bindings::{
+    OSSL_PARAM, OSSL_PARAM_INTEGER, OSSL_PARAM_OCTET_STRING,
+    OSSL_PARAM_UNSIGNED_INTEGER, OSSL_PARAM_UTF8_PTR, OSSL_PARAM_UTF8_STRING,
+};
+// FIXME: We should re-export this as well, once we actually use it....
+#[expect(unused_imports)]
+use crate::bindings::OSSL_PARAM_OCTET_PTR;
 
 pub mod data;
 
