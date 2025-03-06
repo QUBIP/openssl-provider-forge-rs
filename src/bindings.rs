@@ -31,6 +31,22 @@ mod inner_bindings {
 /// [openssl-core.h(7ossl)]: https://docs.openssl.org/3.2/man7/openssl-core.h/
 pub use inner_bindings::*;
 
+/// This is the value assigned to
+/// [`OSSL_PARAM::return_size`][`CONST_OSSL_PARAM::return_size`]
+/// when defining an `OSSL_PARAM`.
+///
+/// It is [defined as a macro in `openssl/params.h`](https://github.com/openssl/openssl/blob/8d6fd6142b0b55ce029df6d7b63dda5f7cb8ce54/include/openssl/params.h#L22)
+/*
+ * core::ffi:c_size_t is only in nightly, and unstable
+ *
+ * https://github.com/rust-lang/rust/issues/88345 seems to have stalled,
+ * so for now we just assume c_size_t and usize are the same.
+ *
+ * TODO: revisit if c_size_t goes stable
+ */
+// const OSSL_PARAM_UNMODIFIED: usize = core::ffi::c_size_t::MAX;
+pub const OSSL_PARAM_UNMODIFIED: usize = usize::MAX;
+
 /// We alias under this namespace the `CONST_OSSL_PARAM` type available under `crate::osslparams`
 pub use crate::osslparams::CONST_OSSL_PARAM;
 

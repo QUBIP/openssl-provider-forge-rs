@@ -9,7 +9,7 @@ use std::{ffi::CStr, marker::PhantomData};
 // We re-export related definitions from the FFI bindings, as they are generally
 // of use to users of this module.
 pub use crate::bindings::{
-    OSSL_PARAM, OSSL_PARAM_INTEGER, OSSL_PARAM_OCTET_STRING,
+    OSSL_PARAM, OSSL_PARAM_INTEGER, OSSL_PARAM_OCTET_STRING, OSSL_PARAM_UNMODIFIED,
     OSSL_PARAM_UNSIGNED_INTEGER, OSSL_PARAM_UTF8_PTR, OSSL_PARAM_UTF8_STRING,
 };
 // FIXME: We should re-export this as well, once we actually use it....
