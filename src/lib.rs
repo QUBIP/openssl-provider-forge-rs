@@ -1,3 +1,8 @@
+//! [LICENSE]: ../LICENSE
+//! [!NOTE]: # "ℹ️ NOTE"
+//! [!CAUTION]: # "⚠️ CAUTION"
+#![doc = include_str!("../README.md")]
+
 pub mod bindings;
 pub mod ossl_callback;
 pub mod osslparams;
