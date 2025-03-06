@@ -1,5 +1,15 @@
-/// We encapsulate the output of bindgen in a inner module, so we can
-/// disable clippy and other lints for the generated code
+//! These are `bindgen`-generated FFI (Foreign Function Interface)
+//! definitions for
+//! `OpenSSL 3.2+`, and
+//! specifically for its `Core` ([openssl-core.h(7ossl)])
+//! and `Provider` ([provider(7ossl)], [provider-base(7ossl)]) APIs.
+//!
+//! [provider(7ossl)]: https://docs.openssl.org/3.2/man7/provider/
+//! [provider-base(7ossl)]: https://docs.openssl.org/3.2/man7/provider-base/
+//! [openssl-core.h(7ossl)]: https://docs.openssl.org/3.2/man7/openssl-core.h/
+
+// We encapsulate the output of bindgen in a inner module, so we can
+// disable clippy and other lints for the generated code
 #[allow(clippy::all)]
 #[allow(non_upper_case_globals)]
 #[allow(non_camel_case_types)]
@@ -9,7 +19,16 @@ mod inner_bindings {
     include!(concat!(env!("OUT_DIR"), "/bindings.rs"));
 }
 
-/// Then we export as pub all the symbols from the inner module.
+// Then we export as pub all the symbols from the inner module.
+/// These are `bindgen`-generated FFI (Foreign Function Interface)
+/// definitions for
+/// `OpenSSL 3.2+`, and
+/// specifically for its `Core` ([openssl-core.h(7ossl)])
+/// and `Provider` ([provider(7ossl)], [provider-base(7ossl)]) APIs.
+///
+/// [provider(7ossl)]: https://docs.openssl.org/3.2/man7/provider/
+/// [provider-base(7ossl)]: https://docs.openssl.org/3.2/man7/provider-base/
+/// [openssl-core.h(7ossl)]: https://docs.openssl.org/3.2/man7/openssl-core.h/
 pub use inner_bindings::*;
 
 /// We alias under this namespace the `CONST_OSSL_PARAM` type available under `crate::osslparams`

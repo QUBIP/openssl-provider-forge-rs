@@ -1,4 +1,4 @@
-//! This submodule provides functionality for handling OpenSSL octetsdfsdsa parameters.
+//! This submodule provides functionality for handling OpenSSL octet parameters.
 
 use std::slice::from_raw_parts;
 
@@ -66,6 +66,7 @@ impl<'a> TypedOSSLParamData<&'a [u8]> for OctetStringData<'_> {
     }
 }
 
+/// todo()!: Examples
 impl TryFrom<*mut OSSL_PARAM> for OctetStringData<'_> {
     type Error = OSSLParamError;
 

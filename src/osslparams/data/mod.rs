@@ -1,7 +1,7 @@
-//! The `data` module provides functionalities for handling different data types:
-//! integers (`int`), unsigned integers (`uint`), and UTF-8 pointers (`utf8_ptr`).
+//! The `data` module provides functionalities for handling different data types.
+//! Data types include integers (`int`), unsigned integers (`uint`),
+//! UTF-8 pointers (`utf8_ptr`), and Octet.
 //!
-//! It re-exports these submodules for easy access.
 
 pub mod int;
 pub mod octet;

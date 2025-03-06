@@ -141,6 +141,7 @@ impl TryFrom<*mut OSSL_PARAM> for Utf8PtrData<'_> {
     /// into an appropriate variant of the `OSSLParam` enum. It performs safety checks to ensure
     /// that the pointer is not null and that the `data_type` of the parameter matches one of the
     /// expected OpenSSL parameter types.
+    ///
     fn try_from(param: *mut OSSL_PARAM) -> Result<Self, Self::Error> {
         match unsafe { param.as_mut() } {
             Some(param) => {
@@ -155,6 +156,7 @@ impl TryFrom<*mut OSSL_PARAM> for Utf8PtrData<'_> {
     }
 }
 
+/// todo()!: Examples
 impl TryFrom<*mut OSSL_PARAM> for Utf8StringData<'_> {
     type Error = OSSLParamError;
 

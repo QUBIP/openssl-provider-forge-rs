@@ -1,10 +1,8 @@
-//! This submodule provides functionality for handling OpenSSL integer parameters.
-//!
 //! The `int` submodule focuses on handling and converting OpenSSL integer types, represented by
-//! the `OSSL_PARAM_INTEGER`. It provides type-safe wrappers and utility functions for working with
-//! different integer sizes (e.g., `i8`, `i16`, `i32`, and `i64`) and for interacting with OpenSSL
-//! parameter structures.
-//!
+//! the `OSSL_PARAM_INTEGER`.
+//! It provides type-safe wrappers and utility functions for working with
+//! different integer sizes (e.g., `i8`, `i16`, `i32`, and `i64`) and for
+//! interacting with OpenSSL parameter structures.
 
 use num_traits::ToPrimitive;
 
@@ -14,7 +12,8 @@ use crate::osslparams::{
     OSSLParamGetter, TypedOSSLParamData,
 };
 
-/// A marker trait that extends `PrimInt` from `num_traits`, indicating that a type is a primitive integer.
+/// A marker trait that extends `PrimInt` from `num_traits`,
+/// indicating that a type is a primitive integer.
 pub trait PrimIntMarker: num_traits::PrimInt {}
 
 impl PrimIntMarker for i8 {}

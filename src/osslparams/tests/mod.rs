@@ -100,7 +100,7 @@ mod generic {
                 }
                 _ => unreachable!(),
             }
-            counter = counter + 1;
+            counter += 1;
         }
 
         assert_eq!(counter, 3);
