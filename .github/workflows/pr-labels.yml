@@ -8,6 +8,8 @@ on:
 jobs:
   pr_labels:
     name: 🏭 Verify
+    permissions:
+      pull-requests: write
     runs-on: ubuntu-latest
     steps:
       - name: 🏷 Verify PR has a valid label
@@ -15,6 +17,7 @@ jobs:
         with:
           github-token: "${{ secrets.GITHUB_TOKEN }}"
           valid-labels: >-
-            breaking-change, bugfix, documentation, enhancement,
-            refactor, performance, new-feature, maintenance, ci, dependencies
+            kind/breaking-change, kind/bug, kind/documentation, kind/enhancement,
+            kind/refactor, kind/performance, kind/new-feature, kind/maintenance,
+            kind/ci, kind/dependencies
           disable-reviews: true
