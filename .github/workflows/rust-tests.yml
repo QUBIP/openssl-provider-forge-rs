@@ -8,35 +8,24 @@ on:
   pull_request:
     branches: [master]
 jobs:
-  checkout:
-    runs-on: ubuntu-latest
-    permissions:
-      contents: read
-    steps:
-      - name: Check out repository code
-        uses: actions/checkout@v4
-
   lint-code:
-    needs: checkout
     runs-on: ubuntu-latest
     permissions:
       contents: read
       statuses: read
     container: "nisectuni/qubip-ossl-rust-runner:latest-nix"
     steps:
-      #- name: Check out repository code
-      #  uses: actions/checkout@v4
+      - name: Check out repository code
+        uses: actions/checkout@v4
       - name: "Check rustc version"
         run: rustc --version
       - name: "Check cargo version"
         run: cargo --version
       - name: "Check openssl version"
         run: openssl version -a
-      - name: Check out repository code
-        run: git checkout --progress --force
       - run: cargo fmt -- --check
   test-code:
-    needs: checkout
+    needs: lint-code
     runs-on: ubuntu-latest
     permissions:
       contents: read
