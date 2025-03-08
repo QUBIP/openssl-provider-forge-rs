@@ -9,11 +9,14 @@ on:
     branches: [master]
 jobs:
   lint-code:
+    permissions:
+      contents: read
+      statuses: read
     runs-on: ubuntu-latest
     container: "nisectuni/qubip-ossl-rust-runner:latest-nix"
     steps:
-      - name: Check out repository code
-        uses: actions/checkout@v4
+      #- name: Check out repository code
+      #  uses: actions/checkout@v4
       - name: "Check rustc version"
         run: rustc --version
       - name: "Check cargo version"
@@ -22,11 +25,14 @@ jobs:
         run: openssl version -a
       - run: cargo fmt -- --check
   test-code:
+    permissions:
+      contents: read
+      statuses: read
     runs-on: ubuntu-latest
     container: "nisectuni/qubip-ossl-rust-runner:latest-nix"
     steps:
-      - name: Check out repository code
-        uses: actions/checkout@v4
+      #- name: Check out repository code
+      #  uses: actions/checkout@v4
       - name: "Check rustc version"
         run: rustc --version
       - name: "Check cargo version"
