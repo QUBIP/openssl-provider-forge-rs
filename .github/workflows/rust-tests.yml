@@ -8,11 +8,20 @@ on:
   pull_request:
     branches: [master]
 jobs:
+  checkout:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v4
+
   lint-code:
+    needs: checkout
+    runs-on: ubuntu-latest
     permissions:
       contents: read
       statuses: read
-    runs-on: ubuntu-latest
     container: "nisectuni/qubip-ossl-rust-runner:latest-nix"
     steps:
       #- name: Check out repository code
@@ -27,10 +36,11 @@ jobs:
         run: git checkout --progress --force
       - run: cargo fmt -- --check
   test-code:
+    needs: checkout
+    runs-on: ubuntu-latest
     permissions:
       contents: read
       statuses: read
-    runs-on: ubuntu-latest
     container: "nisectuni/qubip-ossl-rust-runner:latest-nix"
     steps:
       #- name: Check out repository code
