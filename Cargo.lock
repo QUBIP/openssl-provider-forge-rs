@@ -202,7 +202,7 @@ dependencies = [
 
 [[package]]
 name = "openssl_provider_forge"
-version = "0.8.0"
+version = "0.8.1-dev"
 dependencies = [
  "anyhow",
  "bindgen",
