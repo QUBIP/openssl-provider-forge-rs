@@ -23,6 +23,8 @@ jobs:
         run: cargo --version
       - name: "Check openssl version"
         run: openssl version -a
+      - name: Check out repository code
+        run: git checkout --progress --force
       - run: cargo fmt -- --check
   test-code:
     permissions:
@@ -39,5 +41,7 @@ jobs:
         run: cargo --version
       - name: "Check openssl version"
         run: openssl version -a
+      - name: Check out repository code
+        run: git checkout --progress --force
       - name: "Execute cargo test"
         run: cargo test
