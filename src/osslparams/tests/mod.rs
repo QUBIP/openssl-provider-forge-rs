@@ -1,5 +1,8 @@
 use super::*;
 
+use crate::tests::common;
+use common::OurError;
+
 mod iterator;
 mod null; // new_null tests
 mod setter; // set tests
@@ -9,9 +12,14 @@ mod generic {
     use super::*;
     use std::ptr;
 
+    fn setup() -> Result<(), OurError> {
+        common::setup()
+    }
+
     #[test]
     fn test_basic_usage() {
-        //pretty_env_logger::try_init().expect("Failed initializing logger subsystem");
+        setup().expect("setup() failed");
+
         let mut ossl_param = OSSL_PARAM {
             data: std::ptr::null_mut(),
             data_type: OSSL_PARAM_INTEGER,

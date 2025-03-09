@@ -46,3 +46,6 @@ pub mod keymgmt {
         }
     }
 }
+
+#[cfg(test)]
+pub(crate) mod tests;
