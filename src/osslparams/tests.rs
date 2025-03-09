@@ -1,5 +1,4 @@
 use super::*;
-
 use crate::tests::common;
 use common::OurError;
 
@@ -62,6 +61,8 @@ mod generic {
     ///
     /// If this test breaks, please fix also the corresponding example in the doccomment.
     fn test_variant_name_simple() {
+        setup().expect("setup() failed");
+
         let param = OSSLParam::new_const_int(c"some_key", Some(&42i64));
         let param: OSSLParam = OSSLParam::try_from(&param).unwrap();
 
@@ -79,6 +80,8 @@ mod generic {
     ///
     /// If this test breaks, please fix also the corresponding example in the doccomment.
     fn test_variant_name_list() {
+        setup().expect("setup() failed");
+
         // NOTE: it's very important valid lists of parameters are ALWAYS terminated by END item
         let params_list = [
             OSSLParam::new_const_int(c"foo", Some(&1i32)), // This is an Int
