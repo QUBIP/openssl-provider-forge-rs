@@ -4,6 +4,8 @@ use super::*;
 
 #[test]
 fn test_params_iterator() {
+    setup().expect("setup() failed");
+
     let a = [
         {
             let d = c"an arbitrary string";
@@ -43,6 +45,8 @@ fn test_params_iterator() {
 
 #[test]
 fn test_params_intoiterator() {
+    setup().expect("setup() failed");
+
     let a = [
         {
             let d = c"an arbitrary string";

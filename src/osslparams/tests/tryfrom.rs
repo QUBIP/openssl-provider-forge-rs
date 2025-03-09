@@ -5,6 +5,8 @@ use std::ptr;
 
 #[test]
 fn test_int_data_try_from() {
+    setup().expect("setup() failed");
+
     let mut ossl_param = OSSL_PARAM {
         data: std::ptr::null_mut(),
         data_type: OSSL_PARAM_INTEGER,
@@ -21,6 +23,8 @@ fn test_int_data_try_from() {
 
 #[test]
 fn test_utf8_ptr_try_from() {
+    setup().expect("setup() failed");
+
     let mut ossl_param = OSSL_PARAM {
         data: std::ptr::null_mut(),
         data_type: OSSL_PARAM_UTF8_PTR,
@@ -37,6 +41,8 @@ fn test_utf8_ptr_try_from() {
 
 #[test]
 fn test_uint_try_from() {
+    setup().expect("setup() failed");
+
     let mut ossl_param = OSSL_PARAM {
         data: std::ptr::null_mut(),
         data_type: OSSL_PARAM_UNSIGNED_INTEGER,

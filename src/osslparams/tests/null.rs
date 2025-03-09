@@ -4,6 +4,8 @@ use super::*;
 
 #[test]
 fn test_utf8_ptr_data_new_null() {
+    setup().expect("setup() failed");
+
     let key = c"test_key";
     let utf8_data = Utf8PtrData::new_null(&key);
     assert!(
@@ -14,6 +16,8 @@ fn test_utf8_ptr_data_new_null() {
 
 #[test]
 fn test_int_data_new_null() {
+    setup().expect("setup() failed");
+
     let key = c"test_key";
     let int_data = IntData::new_null(&key);
     assert!(
@@ -24,6 +28,8 @@ fn test_int_data_new_null() {
 
 #[test]
 fn test_uint_data_new_null() {
+    setup().expect("setup() failed");
+
     let key = c"test_key";
     let uint_data = UIntData::new_null(&key);
     assert!(

@@ -7,13 +7,13 @@ mod null; // new_null tests
 mod setter; // set tests
 mod tryfrom; // try_from tests
 
+fn setup() -> Result<(), OurError> {
+    common::setup()
+}
+
 mod generic {
     use super::*;
     use std::ptr;
-
-    fn setup() -> Result<(), OurError> {
-        common::setup()
-    }
 
     #[test]
     fn test_basic_usage() {
@@ -23,7 +23,7 @@ mod generic {
             data: std::ptr::null_mut(),
             data_type: OSSL_PARAM_INTEGER,
             data_size: size_of::<i32>(),
-            return_size: 0,
+            return_size: OSSL_PARAM_UNMODIFIED,
             key: ptr::null(),
         };
         let result = IntData::try_from(&mut ossl_param as *mut OSSL_PARAM);
