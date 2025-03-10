@@ -33,7 +33,26 @@ mod tests;
 pub enum OSSLParam<'a> {
     /// Represents a [OSSL_PARAM(3ossl)] of type [`OSSL_PARAM_UTF8_PTR`]:
     ///
-    /// ## TODO(🛠️): quote more documentation for this type from [OSSL_PARAM(3ossl)]
+    /// > The parameter data is a pointer to a printable string.
+    ///
+    /// > The difference between this and [`OSSL_PARAM_UTF8_STRING`] is that _data_ doesn't point
+    /// > directly at the data, but to a pointer that points to the data.
+    ///
+    /// > If there is any uncertainty about which to use, [`OSSL_PARAM_UTF8_STRING`]
+    /// > is almost certainly the correct choice.
+    ///
+    /// > This is used to indicate that constant data is or will be passed,
+    /// > and there is therefore no need to copy the data that is passed,
+    /// > just the pointer to it.
+    ///
+    /// > [`CONST_OSSL_PARAM::data_size`] must be set to the size of the data, not the size
+    /// > of the pointer to the data.
+    /// > If this is used in a parameter request, data_size is not relevant.
+    /// > However, the responder will set return_size to the size of the data.
+    ///
+    /// > Note that the use of this type is **fragile** and can only be safely used for data
+    /// > that remains constant and in a constant location for a long enough
+    /// > duration (such as the life-time of the entity that offers these parameters).
     ///
     /// [OSSL_PARAM(3ossl)]: https://docs.openssl.org/master/man3/OSSL_PARAM/
     Utf8Ptr(Utf8PtrData<'a>),
@@ -1283,17 +1302,41 @@ pub struct CONST_OSSL_PARAM {
 
     /// declare what kind of content is in data
     ///
-    /// > ## ️🛠️ TODO: quote details from [manpage](https://docs.openssl.org/master/man3/OSSL_PARAM/)
+    /// > The [`Self::data_type`] is a value that describes the type and organization of the data.
+    ///
+    /// The values for this field are:
+    /// * [`OSSL_PARAM_INTEGER`] -> [`OSSLParam::Int`]
+    /// * [`OSSL_PARAM_UNSIGNED_INTEGER`] -> [`OSSLParam::UInt`]
+    /// * [`OSSL_PARAM_OCTET_PTR`] -> [`OSSLParam::OctetPtr`]
+    /// * [`OSSL_PARAM_OCTET_STRING`] -> [`OSSLParam::OctetString`]
+    /// * [`OSSL_PARAM_UTF8_PTR`] -> [`OSSLParam::Utf8Ptr`]
+    /// * [`OSSL_PARAM_UTF8_STRING`] -> [`OSSLParam::Utf8String`]
     pub data_type: ::std::os::raw::c_uint,
 
     /// value being passed in or out
     ///
-    /// > ## ️🛠️ TODO: quote details from [manpage](https://docs.openssl.org/master/man3/OSSL_PARAM/)
+    /// > [`Self::data`] is a pointer to the memory where the parameter data is (when setting parameters) or
+    /// > shall (when requesting parameters) be stored, and [`Self::data_size`] is its size in bytes.
+    /// > The organization of the data depends on the parameter type and flag.
+    /// > The [`Self::data_size`] needs special attention with the parameter type
+    /// > [`OSSL_PARAM_UTF8_STRING`] in relation to C strings.
+    /// > When setting parameters, the size should be set to the length of the string,
+    /// > not counting the terminating NUL byte.
+    /// > When requesting parameters, the size should be set to the size of the buffer
+    /// > to be populated, which should accommodate enough space for a terminating NUL byte.
+    /// > When requesting parameters, it's acceptable for data to be NULL.
+    /// > This can be used by the requester to figure out dynamically exactly how much
+    /// > buffer space is needed to store the parameter data.
+    /// > In this case, [`Self::data_size`] is ignored.
+    /// > When the [`OSSL_PARAM`] is used as a parameter descriptor, data should be ignored.
+    /// > If [`Self::data_size`] is zero, it means that an arbitrary data size is accepted,
+    /// > otherwise it specifies the maximum size allowed.
+    ///
     pub data: *const ::std::os::raw::c_void,
 
     /// data size
     ///
-    /// > ## ️🛠️ TODO: quote details from [manpage](https://docs.openssl.org/master/man3/OSSL_PARAM/)
+    /// See [`Self::data`] for more details.
     pub data_size: usize,
 
     /// returned size
