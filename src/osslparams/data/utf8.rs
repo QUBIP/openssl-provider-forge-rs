@@ -156,7 +156,7 @@ impl TryFrom<*mut OSSL_PARAM> for Utf8PtrData<'_> {
     }
 }
 
-/// todo()!: Examples
+/// ## TODO(🛠️): add examples (tracked by: [#3](https://gitlab.com/nisec/qubip/openssl-provider-forge-rs/-/issues/3))
 impl TryFrom<*mut OSSL_PARAM> for Utf8StringData<'_> {
     type Error = OSSLParamError;
 

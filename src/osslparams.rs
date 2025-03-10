@@ -106,7 +106,7 @@ impl<'a> OSSLParam<'a> {
     ///
     /// # Examples
     ///
-    /// ## TODO(🛠️): add examples
+    /// ## TODO(🛠️): add examples (tracked by: [#6](https://gitlab.com/nisec/qubip/openssl-provider-forge-rs/-/issues/6))
     ///
     pub const fn new_const_utf8ptr(key: &'a KeyType, value: Option<&'a CStr>) -> CONST_OSSL_PARAM {
         let (data, data_size) = match value {
@@ -141,7 +141,7 @@ impl<'a> OSSLParam<'a> {
     ///
     /// # Examples
     ///
-    /// ## TODO(🛠️): add examples
+    /// ## TODO(🛠️): add examples (tracked by: [#6](https://gitlab.com/nisec/qubip/openssl-provider-forge-rs/-/issues/6))
     ///
     pub const fn new_const_utf8string(
         key: &'a KeyType,
@@ -177,7 +177,7 @@ impl<'a> OSSLParam<'a> {
     ///
     /// # Examples
     ///
-    /// ## TODO(🛠️): add examples
+    /// ## TODO(🛠️): add examples (tracked by: [#6](https://gitlab.com/nisec/qubip/openssl-provider-forge-rs/-/issues/6))
     ///
     pub const fn new_const_int<T>(key: &'a KeyType, value: Option<&'a T>) -> CONST_OSSL_PARAM
     where
@@ -213,7 +213,7 @@ impl<'a> OSSLParam<'a> {
     ///
     /// # Examples
     ///
-    /// ## TODO(🛠️): add examples
+    /// ## TODO(🛠️): add examples (tracked by: [#6](https://gitlab.com/nisec/qubip/openssl-provider-forge-rs/-/issues/6))
     ///
     pub const fn new_const_uint<T>(key: &'a KeyType, value: Option<&'a T>) -> CONST_OSSL_PARAM
     where
@@ -249,7 +249,7 @@ impl<'a> OSSLParam<'a> {
     ///
     /// # Examples
     ///
-    /// ## TODO(🛠️): add examples
+    /// ## TODO(🛠️): add examples (tracked by: [#6](https://gitlab.com/nisec/qubip/openssl-provider-forge-rs/-/issues/6))
     ///
     pub const fn new_const_octetstring(
         key: &'a KeyType,
@@ -407,7 +407,7 @@ impl<'a> OSSLParam<'a> {
     ///
     /// # Examples
     ///
-    /// ## TODO(🛠️): add examples
+    /// ## TODO(🛠️): add examples (tracked by: [#7](https://gitlab.com/nisec/qubip/openssl-provider-forge-rs/-/issues/7))
     ///
     pub fn set<T>(&mut self, value: T) -> Result<(), OSSLParamError>
     where
@@ -508,7 +508,7 @@ impl<'a> OSSLParam<'a> {
     ///
     /// # Examples
     ///
-    /// ## TODO(🛠️): add examples
+    /// ## TODO(🛠️): add examples (tracked by: [#8](https://gitlab.com/nisec/qubip/openssl-provider-forge-rs/-/issues/8))
     ///
     pub fn get_c_struct_mut(&mut self) -> *mut OSSL_PARAM {
         match self {
@@ -572,8 +572,7 @@ impl<'a> OSSLParam<'a> {
     ///
     /// # Examples
     ///
-    /// ## TODO(🛠️): add examples
-    ///
+    /// ## TODO(🛠️): add examples (tracked by: [#9](https://gitlab.com/nisec/qubip/openssl-provider-forge-rs/-/issues/9))
     pub fn get_data_type(&self) -> Option<u32> {
         let cptr: *const OSSL_PARAM = self.get_c_struct();
         // FIXME: cptr could be NULL
@@ -591,7 +590,7 @@ impl<'a> OSSLParam<'a> {
     ///
     /// # Examples
     ///
-    /// ## TODO(🛠️): add examples
+    /// ## TODO(🛠️): add examples (tracked by: [#10](https://gitlab.com/nisec/qubip/openssl-provider-forge-rs/-/issues/10))
     ///
     /// [OSSL_PARAM_modified(3ossl)]: https://docs.openssl.org/master/man3/OSSL_PARAM_modified/
     //
@@ -700,7 +699,7 @@ pub trait OSSLParamSetter<T> {
     ///
     /// # Examples
     ///
-    /// ## TODO(🛠️): add examples
+    /// ## TODO(🛠️): add examples (tracked by: [#12](https://gitlab.com/nisec/qubip/openssl-provider-forge-rs/-/issues/12))
     ///
     fn set_inner(&mut self, value: T) -> Result<(), OSSLParamError>;
 }
@@ -723,7 +722,7 @@ pub trait OSSLParamGetter<T> {
     ///
     /// # Examples
     ///
-    /// ## TODO(🛠️): add examples
+    /// ## TODO(🛠️): add examples (tracked by: [#12](https://gitlab.com/nisec/qubip/openssl-provider-forge-rs/-/issues/12))
     ///
     fn get_inner(&self) -> Option<T>;
 }
@@ -739,7 +738,7 @@ pub trait OSSLParamData {
     ///
     /// # Examples
     ///
-    /// ## TODO(🛠️): add examples
+    /// ## TODO(🛠️): add examples (tracked by: [#12](https://gitlab.com/nisec/qubip/openssl-provider-forge-rs/-/issues/12))
     ///
     fn new_null(key: &KeyType) -> Self
     where
@@ -765,7 +764,7 @@ pub trait TypedOSSLParamData<T>: OSSLParamData {
     ///
     /// # Examples
     ///
-    /// ## TODO(🛠️): add examples
+    /// ## TODO(🛠️): add examples (tracked by: [#12](https://gitlab.com/nisec/qubip/openssl-provider-forge-rs/-/issues/12))
     ///
     fn set(&mut self, value: T) -> Result<(), OSSLParamError>;
 }

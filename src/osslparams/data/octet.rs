@@ -66,7 +66,7 @@ impl<'a> TypedOSSLParamData<&'a [u8]> for OctetStringData<'_> {
     }
 }
 
-/// todo()!: Examples
+/// ## TODO(🛠️): add examples (tracked by: [#4](https://gitlab.com/nisec/qubip/openssl-provider-forge-rs/-/issues/4))
 impl TryFrom<*mut OSSL_PARAM> for OctetStringData<'_> {
     type Error = OSSLParamError;
 
