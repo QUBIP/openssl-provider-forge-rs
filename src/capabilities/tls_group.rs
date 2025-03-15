@@ -12,7 +12,7 @@
 //!
 //! ```rust
 //! use openssl_provider_forge::capabilities::tls_group;
-//! use tls_group::{TLSGroup,CStr};
+//! use tls_group::*;
 //!
 //! // Define a TLS group
 //! pub struct X25519MLKEM768Group;
@@ -23,9 +23,10 @@
 //!     const GROUP_NAME_INTERNAL: &'static CStr = c"X25519MLKEM768";
 //!     const GROUP_ALG: &'static CStr = c"X25519MLKEM768";
 //!     const SECURITY_BITS: u32 = 192;
-//!     const MIN_TLS: i32 = 0x0304; // TLS 1.3
-//!     const MAX_TLS: i32 = 0; // no set version
-//!     // Using default values for MIN_DTLS (-1) and MAX_DTLS (-1)
+//!     const MIN_TLS: TLSVersion = TLSVersion::TLSv1_3; // TLS 1.3
+//!     const MAX_TLS: TLSVersion = TLSVersion::None; // no set version
+//!     const MIN_DTLS: DTLSVersion = DTLSVersion::Disabled;
+//!     const MAX_DTLS: DTLSVersion = DTLSVersion::Disabled;
 //!     const IS_KEM: bool = true;
 //! }
 //!
@@ -44,6 +45,8 @@ pub use crate::bindings::{
     OSSL_CAPABILITY_TLS_GROUP_NAME, OSSL_CAPABILITY_TLS_GROUP_NAME_INTERNAL,
     OSSL_CAPABILITY_TLS_GROUP_SECURITY_BITS,
 };
+
+pub use super::{DTLSVersion, TLSVersion};
 
 #[cfg(doc)]
 use crate::osslparams::*;
@@ -78,14 +81,14 @@ pub trait TLSGroup {
     const SECURITY_BITS: u32;
 
     /// min TLS
-    const MIN_TLS: i32;
+    const MIN_TLS: TLSVersion;
     /// max TLS (default to no set maximum version)
-    const MAX_TLS: i32 = 0;
+    const MAX_TLS: TLSVersion = TLSVersion::None;
 
     /// min DTLS (do not use this group at all with DTLS)
-    const MIN_DTLS: i32 = -1;
+    const MIN_DTLS: DTLSVersion = DTLSVersion::Disabled;
     /// max DTLS (do not use this group at all with DTLS)
-    const MAX_DTLS: i32 = -1;
+    const MAX_DTLS: DTLSVersion = DTLSVersion::Disabled;
 
     /// is KEM: yes
     const IS_KEM: bool = false;
@@ -112,7 +115,7 @@ pub trait TLSGroup {
 ///
 /// ```rust
 /// use openssl_provider_forge::capabilities::tls_group;
-/// use tls_group::{TLSGroup,CStr};
+/// use tls_group::*;
 ///
 /// // Define a custom TLS group for the NIST P-256 curve
 /// pub struct P256MLKEM768Group;
@@ -128,10 +131,9 @@ pub trait TLSGroup {
 ///     const GROUP_ALG: &'static CStr = c"SecP256r1MLKEM768";
 ///
 ///     const SECURITY_BITS: u32 = 192;
-///     
-///     const MIN_TLS: i32 = 0x0304; // TLS 1.3
+///
+///     const MIN_TLS: TLSVersion = TLSVersion::TLSv1_3;
 ///     // use default values for MAX_TLS, MIN_DTLS, MAX_DTLS
-///     
 ///     const IS_KEM: bool = true;
 /// }
 ///
@@ -168,8 +170,14 @@ macro_rules! capability_tls_group_as_params {
             assert_implements_tls_group::<$group_type>()
         };
 
-        // Convert bool to u32
+        // Convert bool to const u32
         const IS_KEM_AS_UINT: u32 = if <$group_type>::IS_KEM { 1 } else { 0 };
+
+        // Convert to const i32
+        const MIN_TLS: i32 = <$group_type>::MIN_TLS as i32;
+        const MAX_TLS: i32 = <$group_type>::MAX_TLS as i32;
+        const MIN_DTLS: i32 = <$group_type>::MIN_DTLS as i32;
+        const MAX_DTLS: i32 = <$group_type>::MAX_DTLS as i32;
 
         // Now create the parameter list
         const OSSL_PARAM_ARRAY: &[CONST_OSSL_PARAM] = &[
@@ -193,13 +201,13 @@ macro_rules! capability_tls_group_as_params {
                 Some(&<$group_type>::SECURITY_BITS),
             ),
             // min TLS version
-            OSSLParam::new_const_int(OSSL_CAPABILITY_TLS_GROUP_MIN_TLS, Some(&<$group_type>::MIN_TLS)),
+            OSSLParam::new_const_int(OSSL_CAPABILITY_TLS_GROUP_MIN_TLS, Some(&MIN_TLS)),
             // min TLS version
-            OSSLParam::new_const_int(OSSL_CAPABILITY_TLS_GROUP_MAX_TLS, Some(&<$group_type>::MAX_TLS)),
+            OSSLParam::new_const_int(OSSL_CAPABILITY_TLS_GROUP_MAX_TLS, Some(&MAX_TLS)),
             // min DTLS
-            OSSLParam::new_const_int(OSSL_CAPABILITY_TLS_GROUP_MIN_DTLS, Some(&<$group_type>::MIN_DTLS)),
+            OSSLParam::new_const_int(OSSL_CAPABILITY_TLS_GROUP_MIN_DTLS, Some(&MIN_DTLS)),
             // max DTLS
-            OSSLParam::new_const_int(OSSL_CAPABILITY_TLS_GROUP_MAX_DTLS, Some(&<$group_type>::MAX_DTLS)),
+            OSSLParam::new_const_int(OSSL_CAPABILITY_TLS_GROUP_MAX_DTLS, Some(&MAX_DTLS)),
             // is KEM
             OSSLParam::new_const_uint(OSSL_CAPABILITY_TLS_GROUP_IS_KEM, Some(&IS_KEM_AS_UINT)),
             // IMPORTANT: always terminate a params array!!!
