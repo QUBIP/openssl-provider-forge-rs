@@ -10,9 +10,65 @@
 //!
 //! # Examples
 //!
-//! ## TODO(🛠️): add examples (not tracked yet)
+//! ## Define a custom TLS Signature Algorithm (minimal example only with required definitions)
 //!
-// //! by: [#6](https://gitlab.com/nisec/qubip/openssl-provider-forge-rs/-/issues/6))
+//! ```rust
+//! use openssl_provider_forge::capabilities::tls_sigalg;
+//! use tls_sigalg::*;
+//!
+//! // Define a custom TLS Signature Algorithm
+//! pub struct TLSSigAlgCap;
+//!
+//! impl TLSSigAlg for TLSSigAlgCap {
+//!     const SIGALG_IANA_NAME: &CStr = c"ed448";
+//!
+//!     const SIGALG_CODEPOINT: u32 = 0x0808;
+//!
+//!     const SIGALG_NAME: &CStr = c"EDWARDS448";
+//!
+//!     const SECURITY_BITS: u32 = 192;
+//!     const MIN_TLS: TLSVersion = TLSVersion::TLSv1_3;
+//!     // use default values for MAX_TLS, MIN_DTLS, MAX_DTLS
+//! }
+//!
+//! // Convert the TLS group to OpenSSL parameters
+//! let params = tls_sigalg::as_params!(TLSSigAlgCap);
+//!
+//! // The params can now be used with OpenSSL provider functions
+//! // For example, they could be returned from a provider's get_capabilities function
+//! assert_ne!(params.len(), 0);
+//! ```
+//!
+//! ## Define a custom TLS Signature Algorithm (with some optional definitions)
+//!
+//! ```rust
+//! use openssl_provider_forge::capabilities::tls_sigalg;
+//! use tls_sigalg::*;
+//!
+//! // Define a custom TLS Signature Algorithm
+//! pub struct TLSSigAlgCap;
+//!
+//! impl TLSSigAlg for TLSSigAlgCap {
+//!     const SIGALG_IANA_NAME: &CStr = c"xorhmacsha2sig";
+//!     const SIGALG_NAME: &CStr = Self::SIGALG_IANA_NAME;
+//!     const SIGALG_HASH_NAME: Option<&CStr> = Some(c"SHA256");
+//!     const SIGALG_OID: Option<&CStr> = Some(c"1.3.6.1.4.1.16604.998888.2");
+//!     const SIGALG_CODEPOINT: u32 = 0xFFFF;
+//!
+//!     const SECURITY_BITS: u32 = 128;
+//!     const MIN_TLS: TLSVersion = TLSVersion::TLSv1_3;
+//!     const MAX_TLS: TLSVersion = TLSVersion::TLSv1_3;
+//!     const MIN_DTLS: DTLSVersion = DTLSVersion::DTLSv1_2;
+//!     const MAX_DTLS: DTLSVersion = DTLSVersion::DTLSv1_2;
+//! }
+//!
+//! // Convert the TLS group to OpenSSL parameters
+//! let params = tls_sigalg::as_params!(TLSSigAlgCap);
+//!
+//! // The params can now be used with OpenSSL provider functions
+//! // For example, they could be returned from a provider's get_capabilities function
+//! assert_ne!(params.len(), 0);
+//! ```
 
 pub use std::ffi::CStr;
 
@@ -48,18 +104,78 @@ use crate::osslparams::*;
 ///
 /// # Examples
 ///
-/// ## TODO(🛠️): add examples (not tracked yet)
+/// ## Define a custom TLS Signature Algorithm (minimal example only with required definitions)
 ///
-// /// by: [#6](https://gitlab.com/nisec/qubip/openssl-provider-forge-rs/-/issues/6))
+/// ```rust
+/// # use openssl_provider_forge::bindings;
+/// # use openssl_provider_forge::capabilities;
+/// use capabilities::tls_sigalg;
+/// use tls_sigalg::*;
+///
+/// // Define a custom TLS Signature Algorithm
+/// pub struct TLSSigAlgCap;
+///
+/// impl TLSSigAlg for TLSSigAlgCap {
+///     const SIGALG_IANA_NAME: &CStr = c"ed448";
+///
+///     const SIGALG_CODEPOINT: u32 = 0x0808;
+///
+///     const SIGALG_NAME: &CStr = c"EDWARDS448";
+///
+///     const SECURITY_BITS: u32 = 192;
+///     const MIN_TLS: TLSVersion = TLSVersion::TLSv1_3;
+///     // use default values for MAX_TLS, MIN_DTLS, MAX_DTLS
+/// }
+///
+/// // Convert the TLS group to OpenSSL parameters
+/// let params = tls_sigalg::as_params!(TLSSigAlgCap);
+///
+/// // The params can now be used with OpenSSL provider functions
+/// // For example, they could be returned from a provider's get_capabilities function
+/// assert_ne!(params.len(), 0);
+/// ```
+///
+/// ## Define a custom TLS Signature Algorithm (with some optional definitions)
+///
+/// ```rust
+/// # use openssl_provider_forge::bindings;
+/// # use openssl_provider_forge::capabilities;
+/// use capabilities::tls_sigalg;
+/// use tls_sigalg::*;
+///
+/// // Define a custom TLS Signature Algorithm
+/// pub struct TLSSigAlgCap;
+///
+/// impl TLSSigAlg for TLSSigAlgCap {
+///     const SIGALG_IANA_NAME: &CStr = c"xorhmacsha2sig";
+///     const SIGALG_NAME: &CStr = Self::SIGALG_IANA_NAME;
+///     const SIGALG_HASH_NAME: Option<&CStr> = Some(c"SHA256");
+///     const SIGALG_OID: Option<&CStr> = Some(c"1.3.6.1.4.1.16604.998888.2");
+///     const SIGALG_CODEPOINT: u32 = 0xFFFF;
+///
+///     const SECURITY_BITS: u32 = 128;
+///     const MIN_TLS: TLSVersion = TLSVersion::TLSv1_3;
+///     const MAX_TLS: TLSVersion = TLSVersion::TLSv1_3;
+///     const MIN_DTLS: DTLSVersion = DTLSVersion::DTLSv1_2;
+///     const MAX_DTLS: DTLSVersion = DTLSVersion::DTLSv1_2;
+/// }
+///
+/// // Convert the TLS group to OpenSSL parameters
+/// let params = tls_sigalg::as_params!(TLSSigAlgCap);
+///
+/// // The params can now be used with OpenSSL provider functions
+/// // For example, they could be returned from a provider's get_capabilities function
+/// assert_ne!(params.len(), 0);
+/// ```
 pub trait TLSSigAlg {
-    /// The name of the signature algorithm as given in the [IANA TLS SignatureScheme registry] as "Description".
+    /// The name of the signature algorithm as given in the [IANA TLS SignatureScheme registry][IANA:tls-signaturescheme] as "Description".
     ///
     /// > This value must be supplied
     ///
-    /// [IANA TLS Signature Scheme registry]: https://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml#tls-signaturescheme
+    /// [IANA:tls-signaturescheme]: https://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml#tls-signaturescheme
     const SIGALG_IANA_NAME: &CStr;
 
-    /// The TLS algorithm ID value as given in the IANA TLS SignatureScheme registry.
+    /// The TLS algorithm ID value as given in the [IANA TLS SignatureScheme registry][IANA:tls-signaturescheme].
     ///
     /// > This value must be supplied
     ///
@@ -71,7 +187,7 @@ pub trait TLSSigAlg {
     /// > unspecified which implementation for a particular code point will be
     /// > used.
     ///
-    /// [IANA TLS Signature Scheme registry]: https://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml#tls-signaturescheme
+    /// [IANA:tls-signaturescheme]: https://www.iana.org/assignments/tls-parameters/tls-parameters.xhtml#tls-signaturescheme
     const SIGALG_CODEPOINT: u32;
 
     /// A name for the full (possibly composite hash-and-signature) signature algorithm.
@@ -239,39 +355,44 @@ pub trait TLSSigAlg {
 ///
 /// # Examples
 ///
-/// ## TODO(🛠️): revise examples (not tracked yet)
-// /// by: [#6](https://gitlab.com/nisec/qubip/openssl-provider-forge-rs/-/issues/6))
+/// ```rust
+/// # use openssl_provider_forge::bindings;
+/// # use openssl_provider_forge::capabilities;
+/// use capabilities::tls_sigalg;
+/// use bindings::CONST_OSSL_PARAM;
+/// use tls_sigalg::*;
 ///
-/// ```ignore
-/// use openssl_provider_forge::capabilities::tls_group;
-/// use tls_group::*;
-///
-/// // Define a custom TLS group for the NIST P-256 curve
-/// pub struct P256MLKEM768Group;
-///
-/// impl TLSSigAlg for P256MLKEM768Group {
-///     const IANA_GROUP_NAME: &'static CStr = c"SecP256r1MLKEM768";
-///     const IANA_GROUP_ID: u32 = 4587;
-///
-///     // Internal name used by the provider
-///     const GROUP_NAME_INTERNAL: &'static CStr = c"SecP256r1MLKEM768";
-///
-///     // Key management algorithm
-///     const GROUP_ALG: &'static CStr = c"SecP256r1MLKEM768";
-///
-///     const SECURITY_BITS: u32 = 192;
-///
-///     const MIN_TLS: TLSVersion = TLSVersion::TLSv1_3;
-///     // use default values for MAX_TLS, MIN_DTLS, MAX_DTLS
-///     const IS_KEM: bool = true;
-/// }
+/// # mod some_module {
+/// #     use openssl_provider_forge::capabilities::tls_sigalg;
+/// #     use tls_sigalg::*;
+/// #
+/// #     pub(super) struct TLSSigAlgCapability;
+/// #
+/// #     impl TLSSigAlg for TLSSigAlgCapability {
+/// #         const SIGALG_IANA_NAME: &CStr = c"ed448";
+/// #
+/// #         const SIGALG_CODEPOINT: u32 = 0x0808;
+/// #
+/// #         const SIGALG_NAME: &CStr = c"EDWARDS448";
+/// #
+/// #         const SECURITY_BITS: u32 = 192;
+/// #         const MIN_TLS: TLSVersion = TLSVersion::TLSv1_3;
+/// #         // use default values for MAX_TLS, MIN_DTLS, MAX_DTLS
+/// #     }
+/// # };
+/// #
+/// // Some module implemented `TLSSigAlg` for some `TLSSigAlgCapability`
+/// use some_module::TLSSigAlgCapability;
 ///
 /// // Convert the TLS group to OpenSSL parameters
-/// let params = tls_group::as_params!(P256MLKEM768Group);
+/// let params: &[CONST_OSSL_PARAM] = tls_sigalg::as_params!(TLSSigAlgCapability);
 ///
 /// // The params can now be used with OpenSSL provider functions
 /// // For example, they could be returned from a provider's get_capabilities function
+/// assert_ne!(params.len(), 0);
 /// ```
+///
+/// - See [`TLSSigAlg`] for more examples.
 ///
 /// # Notes
 ///
@@ -282,6 +403,7 @@ macro_rules! capability_tls_sigalg_as_params {
     ($group_type:ty) => {{
         use $crate::osslparams::*;
         use $crate::capabilities::tls_sigalg::*;
+        use $crate::capabilities::optional_param;
 
         // This static assertion will cause a compile error if $group_type doesn't implement TLSSigAlg
         const _: fn() = || {
@@ -290,46 +412,65 @@ macro_rules! capability_tls_sigalg_as_params {
             assert_implements_tls_sigalg::<$group_type>()
         };
 
-        // Convert bool to const u32
-        const IS_KEM_AS_UINT: u32 = if <$group_type>::IS_KEM { 1 } else { 0 };
-
         // Convert to const i32
         const MIN_TLS: i32 = <$group_type>::MIN_TLS as i32;
         const MAX_TLS: i32 = <$group_type>::MAX_TLS as i32;
         const MIN_DTLS: i32 = <$group_type>::MIN_DTLS as i32;
         const MAX_DTLS: i32 = <$group_type>::MAX_DTLS as i32;
 
+        // FIXME: we hardcode these hear for now, rather than conditionally defining them in bindings
+        const OSSL_CAPABILITY_TLS_SIGALG_MIN_DTLS: &CStr = c"tls-min-dtls";
+        const OSSL_CAPABILITY_TLS_SIGALG_MAX_DTLS: &CStr = c"tls-max-dtls";
+
         // Now create the parameter list
         const OSSL_PARAM_ARRAY: &[CONST_OSSL_PARAM] = &[
-            // IANA group name
+            // IANA name for the sigalg
             OSSLParam::new_const_utf8string(
-                OSSL_CAPABILITY_TLS_GROUP_NAME,
-                Some(<$group_type>::IANA_GROUP_NAME)
+                OSSL_CAPABILITY_TLS_SIGALG_IANA_NAME,
+                Some(<$group_type>::SIGALG_IANA_NAME)
             ),
-            // group name according to the provider
+            // IANA code point for the sigalg
+            OSSLParam::new_const_uint(OSSL_CAPABILITY_TLS_SIGALG_CODE_POINT, Some(&<$group_type>::SIGALG_CODEPOINT)),
+
+            // A name for the full (possibly composite hash-and-signature) signature algorithm.
             OSSLParam::new_const_utf8string(
-                OSSL_CAPABILITY_TLS_GROUP_NAME_INTERNAL,
-                Some(<$group_type>::GROUP_NAME_INTERNAL),
+                OSSL_CAPABILITY_TLS_SIGALG_NAME,
+                Some(<$group_type>::SIGALG_NAME)
             ),
-            // keymgmt algorithm name
-            OSSLParam::new_const_utf8string(OSSL_CAPABILITY_TLS_GROUP_ALG, Some(<$group_type>::GROUP_ALG)),
-            // IANA group ID
-            OSSLParam::new_const_uint(OSSL_CAPABILITY_TLS_GROUP_ID, Some(&<$group_type>::IANA_GROUP_ID)),
+            // A name for the full (possibly composite hash-and-signature) signature algorithm.
+            OSSLParam::new_const_utf8string(
+                OSSL_CAPABILITY_TLS_SIGALG_NAME,
+                Some(<$group_type>::SIGALG_NAME)
+            ),
+
+            // The OID of the "sigalg-name" algorithm in canonical numeric text form. [optional]
+            {optional_param!(new_const_utf8string, OSSL_CAPABILITY_TLS_SIGALG_OID, <$group_type>::SIGALG_OID)},
+            // The name of the pure signature algorithm that is part of a composite "sigalg-name". [optional]
+            {optional_param!(new_const_utf8string, OSSL_CAPABILITY_TLS_SIGALG_SIG_NAME, <$group_type>::SIGALG_SIG_NAME)},
+            // The OID of the "sig-name" algorithm in canonical numeric text form. [optional]
+            {optional_param!(new_const_utf8string, OSSL_CAPABILITY_TLS_SIGALG_SIG_OID, <$group_type>::SIGALG_SIG_OID)},
+            // The name of the hash algorithm that is part of a composite "sigalg-name". [optional]
+            {optional_param!(new_const_utf8string, OSSL_CAPABILITY_TLS_SIGALG_HASH_NAME, <$group_type>::SIGALG_HASH_NAME)},
+            // The OID of the "hash-name" algorithm in canonical numeric text form. [optional]
+            {optional_param!(new_const_utf8string, OSSL_CAPABILITY_TLS_SIGALG_HASH_OID, <$group_type>::SIGALG_HASH_OID)},
+            // The key type of the public key of applicable certificates. [optional]
+            {optional_param!(new_const_utf8string, OSSL_CAPABILITY_TLS_SIGALG_KEYTYPE, <$group_type>::SIGALG_KEYTYPE)},
+            // The OID of the "key-type" in canonical numeric text form. [optional]
+            {optional_param!(new_const_utf8string, OSSL_CAPABILITY_TLS_SIGALG_KEYTYPE_OID, <$group_type>::SIGALG_KEYTYPE_OID)},
+
             // number of bits of security
             OSSLParam::new_const_uint(
-                OSSL_CAPABILITY_TLS_GROUP_SECURITY_BITS,
+                OSSL_CAPABILITY_TLS_SIGALG_SECURITY_BITS,
                 Some(&<$group_type>::SECURITY_BITS),
             ),
             // min TLS version
-            OSSLParam::new_const_int(OSSL_CAPABILITY_TLS_GROUP_MIN_TLS, Some(&MIN_TLS)),
+            OSSLParam::new_const_int(OSSL_CAPABILITY_TLS_SIGALG_MIN_TLS, Some(&MIN_TLS)),
             // min TLS version
-            OSSLParam::new_const_int(OSSL_CAPABILITY_TLS_GROUP_MAX_TLS, Some(&MAX_TLS)),
+            OSSLParam::new_const_int(OSSL_CAPABILITY_TLS_SIGALG_MAX_TLS, Some(&MAX_TLS)),
             // min DTLS
-            OSSLParam::new_const_int(OSSL_CAPABILITY_TLS_GROUP_MIN_DTLS, Some(&MIN_DTLS)),
+            OSSLParam::new_const_int(OSSL_CAPABILITY_TLS_SIGALG_MIN_DTLS, Some(&MIN_DTLS)),
             // max DTLS
-            OSSLParam::new_const_int(OSSL_CAPABILITY_TLS_GROUP_MAX_DTLS, Some(&MAX_DTLS)),
-            // is KEM
-            OSSLParam::new_const_uint(OSSL_CAPABILITY_TLS_GROUP_IS_KEM, Some(&IS_KEM_AS_UINT)),
+            OSSLParam::new_const_int(OSSL_CAPABILITY_TLS_SIGALG_MAX_DTLS, Some(&MAX_DTLS)),
             // IMPORTANT: always terminate a params array!!!
             CONST_OSSL_PARAM::END,
         ];
@@ -337,3 +478,50 @@ macro_rules! capability_tls_sigalg_as_params {
     }};
 }
 pub use capability_tls_sigalg_as_params as as_params;
+
+#[cfg(test)]
+mod tests {
+    #![expect(unused_imports)]
+    use crate as openssl_provider_forge;
+    use crate::tests::common::OurError;
+
+    #[expect(dead_code)]
+    fn setup() -> Result<(), OurError> {
+        crate::tests::common::setup()
+    }
+
+    #[cfg(any())]
+    #[test]
+    fn test_basic_usage() {
+        setup().expect("setup() failed");
+
+        use openssl_provider_forge::capabilities::tls_sigalg;
+        use tls_sigalg::*;
+
+        // Define a custom TLS Signature Algorithm
+        pub struct TLSSigAlgCap;
+
+        impl TLSSigAlg for TLSSigAlgCap {
+            const SIGALG_IANA_NAME: &CStr = c"xorhmacsha2sig";
+            const SIGALG_NAME: &CStr = Self::SIGALG_IANA_NAME;
+            const SIGALG_HASH_NAME: Option<&CStr> = Some(c"SHA256");
+            const SIGALG_OID: Option<&CStr> = Some(c"1.3.6.1.4.1.16604.998888.2");
+            const SIGALG_CODEPOINT: u32 = 0xFFFF;
+
+            const SECURITY_BITS: u32 = 128;
+            const MIN_TLS: TLSVersion = TLSVersion::TLSv1_3;
+            const MAX_TLS: TLSVersion = TLSVersion::TLSv1_3;
+            const MIN_DTLS: DTLSVersion = DTLSVersion::DTLSv1_2;
+            const MAX_DTLS: DTLSVersion = DTLSVersion::DTLSv1_2;
+        }
+
+        // Convert the TLS group to OpenSSL parameters
+        let params = tls_sigalg::as_params!(TLSSigAlgCap);
+
+        // The params can now be used with OpenSSL provider functions
+        // For example, they could be returned from a provider's get_capabilities function
+        assert_ne!(params.len(), 0);
+
+        log::debug!("{params:#?}");
+    }
+}
