@@ -4,6 +4,7 @@
 #![doc = include_str!("../README.md")]
 
 pub mod bindings;
+pub mod capabilities;
 pub mod ossl_callback;
 pub mod osslparams;
 
