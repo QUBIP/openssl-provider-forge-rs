@@ -17,3 +17,5 @@ pub use tls_group::TLSGroup;
 
 //pub mod tls_sigalg;
 //pub use tls_sigalg::TLSSigAlg;
+
+pub use crate::{TLSVersion, DTLSVersion};
