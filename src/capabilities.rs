@@ -15,7 +15,8 @@ pub mod tls_group;
 pub use tls_group::as_params as tls_group_as_params;
 pub use tls_group::TLSGroup;
 
-//pub mod tls_sigalg;
-//pub use tls_sigalg::TLSSigAlg;
+pub mod tls_sigalg;
+pub use tls_sigalg::as_params as tls_sigalg_as_params;
+pub use tls_sigalg::TLSSigAlg;
 
 pub use crate::{DTLSVersion, TLSVersion};
