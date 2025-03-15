@@ -8,7 +8,9 @@
 //! methods (KEM). By implementing this capability, providers can extend the list of groups
 //! that `libssl` supports.
 //!
-//! # Example
+//! Refer to [provider-base(7ossl)](https://docs.openssl.org/master/man7/provider-base/#tls-group-capability)
+//!
+//! # Examples
 //!
 //! ```rust
 //! use openssl_provider_forge::capabilities::tls_group;
@@ -53,6 +55,7 @@ use crate::osslparams::*;
 
 /// The "TLS-GROUP" capability can be queried by `libssl` to discover the list of
 /// TLS groups that a provider can support.
+///
 /// Each group supported can be used for key exchange (KEX) or key encapsulation
 /// method (KEM) during a TLS handshake.
 ///
@@ -146,17 +149,8 @@ pub trait TLSGroup {
 ///
 /// # Notes
 ///
-/// The generated parameter array includes all the properties defined in the [`TLSGroup`] trait,
-/// including:
-///
-/// - Group names (IANA and internal)
-/// - Group ID
-/// - Key management algorithm
-/// - Security bits
-/// - TLS and DTLS version ranges
-/// - KEM flag
-///
-/// The array is properly terminated with a `CONST_OSSL_PARAM::END` marker as required by OpenSSL.
+/// The generated parameter array is properly terminated with a
+/// [`CONST_OSSL_PARAM::END`] marker as required by OpenSSL.
 #[macro_export]
 macro_rules! capability_tls_group_as_params {
     ($group_type:ty) => {{

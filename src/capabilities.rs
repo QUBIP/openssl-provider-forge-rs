@@ -8,7 +8,7 @@
 //! * [`tls_group`]
 //! * [`tls_sigalg`]
 //!
-//! Refer to [provider-base(7ossl)](https://docs.openssl.org/3.5/man7/provider-base/#capabilities)
+//! Refer to [provider-base(7ossl)](https://docs.openssl.org/master/man7/provider-base/#capabilities)
 
 pub mod tls_group;
 
