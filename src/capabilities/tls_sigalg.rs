@@ -196,11 +196,18 @@ pub trait TLSSigAlg {
     ///
     /// ## NOTE
     ///
-    /// > The provider may, but is not obligated to, provide a signature
-    /// > implementation with this name;
-    /// > if it doesn't, this is assumed to be a composite of a pure signature
-    /// > algorithm and a hash algorithm, which must be given with
-    /// > [`Self::SIGALG_SIG_NAME`] and [`Self::SIGALG_HASH_NAME`].
+    /// - Note this is also the name that
+    ///   [`SSL_CONF_cmd(-sigalgs)`][SSL_CONF_cmd(3ossl):cli]/[`SSL_CONF_cmd(SignatureAlgorithms)`][SSL_CONF_cmd(3ossl):conf]
+    ///   will support.
+    /// - Quote from [provider-base(7ossl)](https://docs.openssl.org/master/man7/provider-base/#tls-sigalg-capability):
+    ///   > The provider may, but is not obligated to, provide a signature
+    ///   > implementation with this name;
+    ///   > if it doesn't, this is assumed to be a composite of a pure signature
+    ///   > algorithm and a hash algorithm, which must be given with
+    ///   > [`Self::SIGALG_SIG_NAME`] and [`Self::SIGALG_HASH_NAME`].
+    ///
+    /// [SSL_CONF_cmd(3ossl):cli]: https://docs.openssl.org/master/man3/SSL_CONF_cmd/#supported-command-line-commands
+    /// [SSL_CONF_cmd(3ossl):conf]: https://docs.openssl.org/master/man3/SSL_CONF_cmd/#supported-configuration-file-commands
     const SIGALG_NAME: &CStr;
 
     /// The OID of the [`Self::SIGALG_NAME`] algorithm in canonical numeric text form.
