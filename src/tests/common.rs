@@ -12,7 +12,7 @@ fn try_init_logging() -> Result<(), OurError> {
         .format_target(false) // Optional: disable target
         .format_source_path(true)
         .try_init()
-        .map_err(|e| OurError::from(e))
+        .map_err(OurError::from)
 }
 
 pub(crate) fn setup() -> Result<(), OurError> {
