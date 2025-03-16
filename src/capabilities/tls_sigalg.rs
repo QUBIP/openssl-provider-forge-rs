@@ -6,7 +6,7 @@
 //! It also provides the [`as_params`] macro to convert
 //! a type implementing [`TLSSigAlg`] into an OpenSSL parameter array.
 //!
-//! Refer to [provider-base(7ossl)](https://docs.openssl.org/master/man7/provider-base/#tls-sigalg-capability)
+//! Refer to [provider-base(7ossl)](https://docs.openssl.org/master/man7/provider-base/#tls-sigalg-capability).
 //!
 //! # Examples
 //!
@@ -100,7 +100,7 @@ use crate::osslparams::*;
 /// In this way a provider can add to the list of signature algorithms
 /// that `libssl` already supports with additional ones.
 ///
-/// Refer to [provider-base(7ossl)](https://docs.openssl.org/master/man7/provider-base/#tls-sigalg-capability)
+/// Refer to [provider-base(7ossl)](https://docs.openssl.org/master/man7/provider-base/#tls-sigalg-capability).
 ///
 /// # Examples
 ///
