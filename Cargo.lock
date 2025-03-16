@@ -324,7 +324,7 @@ checksum = "cde51589ab56b20a6f686b2c68f7a0bd6add753d697abf720d63f8db3ab7b1ad"
 
 [[package]]
 name = "openssl_provider_forge"
-version = "0.8.2-dev"
+version = "0.8.2-dev-bis"
 dependencies = [
  "anyhow",
  "bindgen",
