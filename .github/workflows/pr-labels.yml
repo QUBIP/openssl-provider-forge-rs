@@ -2,7 +2,7 @@
 name: PR Labels
 
 on:
-  pull_request:
+  pull_request_target:
     types: [opened, labeled, unlabeled, synchronize]
 
 jobs:
@@ -21,3 +21,4 @@ jobs:
             kind/refactor, kind/performance, kind/new-feature, kind/maintenance,
             kind/ci, kind/dependencies
           disable-reviews: true
+          pull-request-number: "${{ github.event.pull_request.number }}"
