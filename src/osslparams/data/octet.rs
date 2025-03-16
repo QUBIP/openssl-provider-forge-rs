@@ -34,7 +34,11 @@ impl_setter!(&[u8], OctetString);
 impl<'a> OSSLParamGetter<&'a [u8]> for OSSLParam<'_> {
     fn get_inner(&self) -> Option<&'a [u8]> {
         if let OSSLParam::OctetString(d) = self {
-            let slice = unsafe { from_raw_parts(d.param.data as *const u8, d.param.data_size) };
+            let ptr = d.param.data as *const u8;
+            if ptr.is_null() {
+                return None;
+            }
+            let slice = unsafe { from_raw_parts(ptr, d.param.data_size) };
             Some(slice)
         } else {
             None

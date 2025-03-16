@@ -72,6 +72,9 @@ impl OSSLParamGetter<u64> for OSSLParam<'_> {
     fn get_inner(&self) -> Option<u64> {
         if let OSSLParam::UInt(d) = self {
             let data = d.param.data;
+            if data.is_null() {
+                return None;
+            };
             match d.param.data_size {
                 s if s == size_of::<u32>() => {
                     Some(unsafe { std::ptr::read(data as *const u32) } as u64)
