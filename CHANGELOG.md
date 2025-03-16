@@ -5,15 +5,47 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.1] - 2025-03-16
+
+### Added
+- Add examples and optional param handling
+- Add TLS Signature Algorithm support
+- Add TLS and DTLS version enums
+- Add TLS group support
+- Add missing docs for CONST_OSSL_PARAM and OSSLParam types
+- Add setup function to all test cases
+
+### Changed
+- Bump to 0.8.1
+- Enhance documentation for SIGALG_NAME
+- Format TOML files
+- Update documentation and examples
+- Refine TLS and DTLS version handling
+- Update local Cargo.lock dependencies
+- Update TODOs
+- Migrate to modern Rust module file naming convention
+- Update dependencies and add test setup
+- Bump version to 0.8.1-dev
+
+### Fixed
+- Fix punctuation in documentation
+- Handle null pointers in data getters
+- Use log::trace instead of log::debug
+
 ## [0.8.0] - 2025-03-08
 
 ### Added
+- Add CODEOWNERS file
+- Add test-doc job
+- Add workflow similar to the gitlab one
 - Add .gitignore to exclude /target directory
 - Add initial GitLab CI configuration
 - Add unit tests for OSSLParam::variant_name()
 - Add missing newlines in osslparams module
 
 ### Changed
+- Bump to 0.8.0
+- Update labels workflow
 - Add Changelog
 - Limit CodeQL tasks to github-action workflows
 - Update CODEOWNERS
@@ -118,6 +150,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 - Remove all naked `unwrap()`
 
+[0.8.1]: https://github.com///compare/v0.8.0..v0.8.1
 [0.8.0]: https://github.com///compare/v0.7.1..v0.8.0
 [0.7.1]: https://github.com///compare/v0.7.0..v0.7.1
 
