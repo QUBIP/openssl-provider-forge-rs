@@ -4,7 +4,10 @@
 //!
 //! [OSSL_PARAM(3ossl)]: https://docs.openssl.org/master/man3/OSSL_PARAM/
 
-use std::{ffi::CStr, marker::PhantomData};
+use std::{
+    ffi::{c_char, CStr},
+    marker::PhantomData,
+};
 
 // We re-export related definitions from the FFI bindings, as they are generally
 // of use to users of this module.
@@ -253,16 +256,14 @@ impl<'a> OSSLParam<'a> {
     ///
     pub const fn new_const_octetstring(
         key: &'a KeyType,
-        value: Option<&'a [i8]>,
+        value: Option<&'a [c_char]>,
     ) -> CONST_OSSL_PARAM {
         let (data, data_size) = match value {
             Some(value) => {
-                //let v = std::ptr::from_ref(value);
-                //let _v = v as *mut std::ffi::c_void;
-                //let sz = todo!();
-                //(v, sz)
-                let _ = value;
-                todo!()
+                let v = std::ptr::from_ref(value);
+                let v = v as *mut std::ffi::c_void;
+                let sz = value.len();
+                (v, sz)
             }
             None => (std::ptr::null_mut(), 0),
         };
