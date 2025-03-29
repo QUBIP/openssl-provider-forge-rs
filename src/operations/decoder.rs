@@ -60,7 +60,7 @@ pub trait DoesSelection {
 mod macros {
     #[macro_export]
     macro_rules! decoder_make_does_selection_fn {
-        ( $fn_name:ident, $decoder:ty ) => {
+        ( $fn_name:ident, $decoder_type:ty ) => {
             // based on oqsprov/oqs_decode_der2key.c:der2key_check_selection() in the OQS provider
             pub(super) unsafe extern "C" fn $fn_name(
                 vprovctx: *mut c_void,
@@ -68,11 +68,17 @@ mod macros {
             ) -> c_int {
                 const ERROR_RET: c_int = 0;
                 log::trace!("Called!");
+
+                const _: fn() = || {
+                    fn assert_impl<T: DoesSelection>() {}
+                    assert_impl::<$decoder_type>();
+                };
+
                 let _provctx: &OpenSSLProvider<'_> = $crate::handleResult!(vprovctx.try_into());
 
                 let selection = $crate::handleResult!(Selection::try_from(selection as u32));
 
-                match <$decoder>::does_selection(selection) {
+                match <$decoder_type>::does_selection(selection) {
                     true => return 1,
                     false => return 0,
                 }
