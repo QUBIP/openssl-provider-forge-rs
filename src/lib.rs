@@ -13,6 +13,12 @@ pub type OurError = anyhow::Error;
 
 use num_enum::{Default, IntoPrimitive, TryFromPrimitive};
 
+// FIXME: remove this later on
+/// **Deprecated**: This re-export is DEPRECATED and will be removed in a future
+/// version, prefer using directly [`operations::keymgmt`].
+#[deprecated(note = "use directly `operations::keymgmt` instead")]
+pub use operations::keymgmt;
+
 /// Represents TLS protocol versions
 ///
 /// # Examples
