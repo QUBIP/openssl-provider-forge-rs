@@ -40,6 +40,10 @@ pub mod ffi_c_types {
 
 pub use ffi_c_types::*;
 
+// FIXME: we hardcode these hear for now, rather than conditionally defining them in bindings
+pub const OSSL_CAPABILITY_TLS_SIGALG_MIN_DTLS: &CStr = c"tls-min-dtls";
+pub const OSSL_CAPABILITY_TLS_SIGALG_MAX_DTLS: &CStr = c"tls-max-dtls";
+
 /// This is the value assigned to
 /// [`OSSL_PARAM::return_size`][`CONST_OSSL_PARAM::return_size`]
 /// when defining an `OSSL_PARAM`.
