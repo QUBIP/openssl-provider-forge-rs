@@ -11,6 +11,7 @@ fn try_init_logging() -> Result<(), OurError> {
         .format_module_path(true) // Optional: disable module path
         .format_target(false) // Optional: disable target
         .format_source_path(true)
+        .is_test(cfg!(test))
         .try_init()
         .map_err(OurError::from)
 }
