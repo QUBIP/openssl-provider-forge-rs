@@ -28,3 +28,4 @@
 
 pub mod decoder;
 pub mod keymgmt;
+pub mod signature;

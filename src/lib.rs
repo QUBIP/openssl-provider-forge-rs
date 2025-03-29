@@ -9,6 +9,8 @@ pub mod operations;
 pub mod ossl_callback;
 pub mod osslparams;
 
+pub use crypto;
+
 pub type OurError = anyhow::Error;
 
 use num_enum::{Default, IntoPrimitive, TryFromPrimitive};
