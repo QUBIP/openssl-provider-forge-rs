@@ -31,6 +31,15 @@ mod inner_bindings {
 /// [openssl-core.h(7ossl)]: https://docs.openssl.org/3.2/man7/openssl-core.h/
 pub use inner_bindings::*;
 
+/// We bundle here the definitions of FFI-types for C-compatible types
+/// for easily re-exporting them in bulk.
+pub mod ffi_c_types {
+    pub use std::ffi::{c_char, c_int, c_uchar, c_uint, c_void};
+    pub use std::ffi::{CStr, CString};
+}
+
+pub use ffi_c_types::*;
+
 /// This is the value assigned to
 /// [`OSSL_PARAM::return_size`][`CONST_OSSL_PARAM::return_size`]
 /// when defining an `OSSL_PARAM`.
@@ -49,8 +58,6 @@ pub const OSSL_PARAM_UNMODIFIED: usize = usize::MAX;
 
 /// We alias under this namespace the `CONST_OSSL_PARAM` type available under `crate::osslparams`
 pub use crate::osslparams::CONST_OSSL_PARAM;
-
-use ::std::os::raw::c_int;
 
 // Why we need to cast the function itself, in the call to `transmute`: the name
 // of a function, like `OSSL_provider_teardown`, is actually a zero-sized type

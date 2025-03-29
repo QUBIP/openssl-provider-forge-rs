@@ -70,8 +70,7 @@
 //! assert_ne!(params.len(), 0);
 //! ```
 
-pub use std::ffi::CStr;
-
+pub use crate::bindings::ffi_c_types::*;
 pub use crate::bindings::{
     OSSL_CAPABILITY_TLS_SIGALG_CODE_POINT, OSSL_CAPABILITY_TLS_SIGALG_HASH_NAME,
     OSSL_CAPABILITY_TLS_SIGALG_HASH_OID, OSSL_CAPABILITY_TLS_SIGALG_IANA_NAME,
