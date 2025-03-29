@@ -16,7 +16,6 @@
 //! [provider(7ossl)]: https://docs.openssl.org/master/man7/provider/
 //! [provider(7ossl)#Operations]: https://docs.openssl.org/master/man7/provider/#operations
 //! [provider-keymgmt(7ossl)]: https://docs.openssl.org/master/man7/provider-keymgmt/
-//! - Depends on OpenSSL bindings for the raw flag values.
 
 /// This submodule defines the `Selection` bitflags used in OpenSSL key management operations.
 ///
@@ -86,7 +85,7 @@ pub mod selection {
         ///     Err(e) => eprintln!("Error: {:?}", e),
         /// }
         /// ```
-        #[derive(Debug)]
+        #[derive(Debug,Clone,Copy)]
         pub struct Selection: u32 {
             const PRIVATE_KEY = bindings::OSSL_KEYMGMT_SELECT_PRIVATE_KEY;
             const PUBLIC_KEY = bindings::OSSL_KEYMGMT_SELECT_PUBLIC_KEY;
