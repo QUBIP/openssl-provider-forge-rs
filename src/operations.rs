@@ -26,4 +26,5 @@
 //! (Add examples here once the module is populated with functionality.)
 //!
 
+pub mod decoder;
 pub mod keymgmt;
