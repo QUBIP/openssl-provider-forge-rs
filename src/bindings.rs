@@ -40,7 +40,7 @@ pub mod ffi_c_types {
 
 pub use ffi_c_types::*;
 
-// FIXME: we hardcode these hear for now, rather than conditionally defining them in bindings
+// FIXME: we hardcode these here for now, rather than conditionally defining them in bindings
 pub const OSSL_CAPABILITY_TLS_SIGALG_MIN_DTLS: &CStr = c"tls-min-dtls";
 pub const OSSL_CAPABILITY_TLS_SIGALG_MAX_DTLS: &CStr = c"tls-max-dtls";
 
