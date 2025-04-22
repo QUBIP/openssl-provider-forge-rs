@@ -1,6 +1,6 @@
 [package]
 name = "openssl_provider_forge"
-version = "0.8.2-dev"
+version = "0.8.3"
 edition = "2021"
 
 [dependencies]
