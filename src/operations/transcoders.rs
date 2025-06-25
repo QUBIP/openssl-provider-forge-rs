@@ -28,6 +28,11 @@ pub trait Decoder {
     const DISPATCH_TABLE: &'static [OSSL_DISPATCH];
 }
 
+pub trait Encoder {
+    const PROPERTY_DEFINITION: &'static CStr;
+    const DISPATCH_TABLE: &'static [OSSL_DISPATCH];
+}
+
 pub trait DoesSelection {
     const SELECTION_MASK: Selection;
     const SUPPORT_GUESSING: bool = true;
