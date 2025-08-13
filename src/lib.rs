@@ -8,6 +8,7 @@ pub mod capabilities;
 pub mod operations;
 pub mod ossl_callback;
 pub mod osslparams;
+pub mod upcalls;
 
 pub use crypto;
 
