@@ -5,6 +5,31 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.3] - 2025-04-23
+
+### Added
+- Add signature utilities
+- Add decoder module for OpenSSL support
+- Add Clone and Copy to Selection struct
+- Add test configuration flag
+- Add handleResult macro for error handling
+- Add documentation for keymgmt module
+- Add constants for DTLS sigalg capabilities
+- Add ffi_c_types module for FFI re-exports
+- Add pull_request_target event handling
+
+### Changed
+- Bump to 0.8.3
+- Cargo update
+- Improve macro type safety
+- Deprecate re-export of `operations::keymgmt`
+- Modularize keymgmt operations
+- Simplify error mapping in setup
+
+### Fixed
+- Fix spelling
+- Implement `new_const_octetstring` logic
+
 ## [0.8.1] - 2025-03-16
 
 ### Added
@@ -25,7 +50,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update TODOs
 - Migrate to modern Rust module file naming convention
 - Update dependencies and add test setup
-- Bump version to 0.8.1-dev
 
 ### Fixed
 - Fix punctuation in documentation
@@ -61,11 +85,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove stale allow(dead_code) annotation
 - Add examples for OSSLParamIterator and IntoIterator
 - Make traits public again
-- Bump version to 0.8.0-dev
 - `new_const_*()` associated functions now take an Option as value
 - Add missing docs
 - Remove ossl_param_locate_raw
-- Bump version to 0.7.2-dev
 
 ### Fixed
 - Fix most failing doctests (Examples)
@@ -150,6 +172,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 - Remove all naked `unwrap()`
 
+[0.8.3]: https://github.com///compare/v0.8.1..v0.8.3
 [0.8.1]: https://github.com///compare/v0.8.0..v0.8.1
 [0.8.0]: https://github.com///compare/v0.7.1..v0.8.0
 [0.7.1]: https://github.com///compare/v0.7.0..v0.7.1
