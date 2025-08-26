@@ -5,9 +5,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.4] - 2025-08-27
+
+### Changed
+
+- Bump to 0.8.4
+- Update Changelog for v0.8.3
+- Lower log level for selection debug
+- Move upcalls module from aurora to forge
+- Rename decoder module to transcoders and add Encoder trait
+
 ## [0.8.3] - 2025-04-23
 
 ### Added
+
 - Add signature utilities
 - Add decoder module for OpenSSL support
 - Add Clone and Copy to Selection struct
@@ -19,6 +30,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add pull_request_target event handling
 
 ### Changed
+
 - Bump to 0.8.3
 - Cargo update
 - Improve macro type safety
@@ -27,12 +39,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Simplify error mapping in setup
 
 ### Fixed
+
 - Fix spelling
 - Implement `new_const_octetstring` logic
 
 ## [0.8.1] - 2025-03-16
 
 ### Added
+
 - Add examples and optional param handling
 - Add TLS Signature Algorithm support
 - Add TLS and DTLS version enums
@@ -41,6 +55,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add setup function to all test cases
 
 ### Changed
+
 - Bump to 0.8.1
 - Enhance documentation for SIGALG_NAME
 - Format TOML files
@@ -52,6 +67,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Update dependencies and add test setup
 
 ### Fixed
+
 - Fix punctuation in documentation
 - Handle null pointers in data getters
 - Use log::trace instead of log::debug
@@ -59,6 +75,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.8.0] - 2025-03-08
 
 ### Added
+
 - Add CODEOWNERS file
 - Add test-doc job
 - Add workflow similar to the gitlab one
@@ -68,6 +85,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add missing newlines in osslparams module
 
 ### Changed
+
 - Bump to 0.8.0
 - Update labels workflow
 - Add Changelog
@@ -90,29 +108,36 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Remove ossl_param_locate_raw
 
 ### Fixed
+
 - Fix most failing doctests (Examples)
 
 ### Removed
+
 - Remove OSSLParam::inner_data()
 
 ## [0.7.1] - 2025-02-21
 
 ### Added
+
 - Add GPG keys for secure communication
 
 ### Changed
+
 - Bump version to 0.7.1
 - Update note on naming conventions
 
 ### Fixed
+
 - Correct typo in README.md
 
 ### Removed
+
 - Remove forbidden module
 
 ## [0.7.0] - 2025-02-18
 
 ### Added
+
 - Add new OSSLParam methods
 - Add iterator support for OSSLParam
 - Add pkg-config dependency and update build.rs
@@ -126,6 +151,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Add OSSL_PARAM implementation using marker traits
 
 ### Changed
+
 - Update Cargo.toml version to 0.7.0
 - Move to top directory after splitting `openssl-provider-forge-rs` from monorepo
 - Alias CONST_OSSL_PARAM in bindings module
@@ -140,7 +166,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Rename rust-openssl-core-provider to openssl_provider_forge
 - Implement an Iterator that gives OSSLParam structs from a OSSL_PARAM pointer
 - Clean up a few more old uses of ossl_param_st
-- Use &mut instead of *mut to store the OSSL_PARAM reference
+- Use &mut instead of \*mut to store the OSSL_PARAM reference
 - Use OSSL_PARAM instead of ossl_param_st everywhere
 - Use $crate in dispatch_table_entry macro
 - Apply `cargo fmt`
@@ -166,12 +192,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Initial commit with README and LICENSE
 
 ### Fixed
+
 - Fmt::Debug must be infallible
 - Use `$crate` in macro to ensure proper resolution of `OSSL_DISPATCH`
 
 ### Removed
+
 - Remove all naked `unwrap()`
 
+[0.8.4]: https://github.com///compare/v0.8.3..v0.8.4
 [0.8.3]: https://github.com///compare/v0.8.1..v0.8.3
 [0.8.1]: https://github.com///compare/v0.8.0..v0.8.1
 [0.8.0]: https://github.com///compare/v0.7.1..v0.8.0
