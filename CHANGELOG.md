@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [Unreleased]
+
+### Added
+
+- New `zeroize-alloc` feature, enabled by default, gating
+  `upcalls::traits::CoreUpcaller::BIO_read_ex()` — it returns a `Box<[u8]>`
+  built from a `Zeroizing` buffer and so requires `zeroize/alloc`.
+
+### Changed
+
+- `anyhow`, `libc`, `num-traits`, `num_enum` and `zeroize` are now declared
+  with `default-features = false`, trimming the transitive dependency tree for
+  constrained builds. None of them are re-exported, so the default build is
+  behaviourally unchanged.
+
 ## [0.10.0] - 2026-07-06
 
 ### Changed

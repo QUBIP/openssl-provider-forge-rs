@@ -26,17 +26,18 @@ pub mod traits {
     use crate::bindings::{c_char, c_int, c_void, CStr};
     use crate::bindings::{
         OSSL_FUNC_core_get_params_fn, OSSL_FUNC_core_gettable_params_fn, OSSL_CORE_BIO,
-        OSSL_FUNC_BIO_READ_EX, OSSL_FUNC_BIO_WRITE_EX, OSSL_FUNC_CORE_GETTABLE_PARAMS,
-        OSSL_FUNC_CORE_GET_PARAMS, OSSL_FUNC_CORE_OBJ_ADD_SIGID, OSSL_FUNC_CORE_OBJ_CREATE,
+        OSSL_FUNC_BIO_WRITE_EX, OSSL_FUNC_CORE_GETTABLE_PARAMS, OSSL_FUNC_CORE_GET_PARAMS,
+        OSSL_FUNC_CORE_OBJ_ADD_SIGID, OSSL_FUNC_CORE_OBJ_CREATE,
     };
     use crate::osslparams::OSSLParam;
     pub(crate) use ::function_name::named;
     use anyhow::anyhow;
     use std::sync::OnceLock;
-    use zeroize::{Zeroize, Zeroizing};
+
     pub trait CoreUpcaller {
         fn fn_from_core_dispatch(&self, id: u32) -> Option<unsafe extern "C" fn()>;
 
+        #[cfg(feature = "zeroize-alloc")]
         #[expect(non_snake_case)]
         #[named]
         /// Makes a BIO_read_ex() core upcall.
@@ -49,6 +50,9 @@ pub mod traits {
             &self,
             bio: *mut OSSL_CORE_BIO,
         ) -> Result<Box<[u8]>, crate::OurError> {
+            use crate::bindings::OSSL_FUNC_BIO_READ_EX;
+            use zeroize::{Zeroize, Zeroizing};
+
             const MAX_ITERATIONS: usize = 10;
             static CELL: OnceLock<Option<unsafe extern "C" fn()>> = OnceLock::new();
 
