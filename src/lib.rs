@@ -18,6 +18,9 @@
 //! - remain valid for the duration of the call,
 //! - respects OpenSSL aliasing/lifetime invariants as required.
 
+// Enables the nightly `doc(cfg(...))` badges on docs.rs, has no effect on normal builds.
+#![cfg_attr(docsrs, feature(doc_cfg))]
+
 pub mod bindings;
 pub mod capabilities;
 pub mod operations;

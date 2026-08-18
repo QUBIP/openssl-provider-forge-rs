@@ -12,6 +12,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - New `zeroize-alloc` feature, enabled by default, gating
   `upcalls::traits::CoreUpcaller::BIO_read_ex()` — it returns a `Box<[u8]>`
   built from a `Zeroizing` buffer and so requires `zeroize/alloc`.
+- docs.rs support: `[package.metadata.docs.rs]` builds with all features and
+  passes `--cfg docsrs`, and feature-gated items now carry
+  `doc(cfg(...))` badges showing which feature enables them.
 
 ### Changed
 
@@ -23,6 +26,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   `OSSL_PROVIDER_FORGE_REGENERATE_BINDINGS` environment variable must also be
   set to a truthy value (`1`, `true`, `yes`, `on`). Enabling `regen` alone no
   longer requires libclang or the OpenSSL headers at build time.
+
+### Fixed
+
+- Bare URLs in `upcalls` doc comments are now autolinks, silencing rustdoc's
+  `bare_urls` lint.
 
 ## [0.10.0] - 2026-07-06
 

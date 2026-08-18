@@ -38,6 +38,7 @@ pub mod traits {
         fn fn_from_core_dispatch(&self, id: u32) -> Option<unsafe extern "C" fn()>;
 
         #[cfg(feature = "zeroize-alloc")]
+        #[cfg_attr(docsrs, doc(cfg(feature = "zeroize-alloc")))]
         #[expect(non_snake_case)]
         #[named]
         /// Makes a BIO_read_ex() core upcall.
@@ -349,7 +350,7 @@ pub mod traits {
             }
         }
 
-        /// See https://docs.openssl.org/3.2/man7/provider-base/#description
+        /// See <https://docs.openssl.org/3.2/man7/provider-base/#description>
         #[expect(non_snake_case)]
         #[named]
         fn CORE_gettable_params(&self) -> Result<OSSLParam<'_>, crate::OurError> {
@@ -378,7 +379,7 @@ pub mod traits {
             p.map_err(|e| anyhow::anyhow!("{e:}"))
         }
 
-        /// See https://docs.openssl.org/3.2/man7/provider-base/#description
+        /// See <https://docs.openssl.org/3.2/man7/provider-base/#description>
         #[expect(non_snake_case)]
         #[named]
         fn CORE_get_params(&self, mut params: OSSLParam) -> Result<(), crate::OurError> {
