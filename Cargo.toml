@@ -9,8 +9,10 @@ homepage = "https://qubip.eu"
 
 [features]
 default = ["zeroize-alloc"]
+
 zeroize-alloc = ["zeroize/alloc"]
-# Opt-in feature to regenerate the bindings
+
+# Opt-in feature to regenerate the bindings (also requires setting OSSL_PROVIDER_FORGE_REGENERATE_BINDINGS)
 regen = ["dep:bindgen", "dep:pkg-config"]
 
 [dependencies]

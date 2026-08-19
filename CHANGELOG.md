@@ -19,6 +19,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
   with `default-features = false`, trimming the transitive dependency tree for
   constrained builds. None of them are re-exported, so the default build is
   behaviourally unchanged.
+- The `regen` feature no longer regenerates bindings on its own: the
+  `OSSL_PROVIDER_FORGE_REGENERATE_BINDINGS` environment variable must also be
+  set to a truthy value (`1`, `true`, `yes`, `on`). Enabling `regen` alone no
+  longer requires libclang or the OpenSSL headers at build time.
 
 ## [0.10.0] - 2026-07-06
 

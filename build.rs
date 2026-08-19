@@ -1,7 +1,26 @@
 #[cfg(feature = "regen")]
+fn env_flag(name: &str) -> bool {
+    println!("cargo:rerun-if-env-changed={name}");
+    let Some(raw) = std::env::var_os(name) else {
+        // we default to false if the env var is not set
+        return false;
+    };
+    match raw.to_string_lossy().trim().to_ascii_lowercase().as_str() {
+        "" | "0" | "false" | "no" | "off" => false,
+        "1" | "true" | "yes" | "on" => true,
+        other => panic!("{name} must be a boolean, got {other:?}"),
+    }
+}
+
+#[cfg(feature = "regen")]
 fn generate_bindings() {
     use std::env;
     use std::path::PathBuf;
+
+    if env_flag("OSSL_PROVIDER_FORGE_REGENERATE_BINDINGS") == false {
+        // We regenerate the bindings only if the above env var is set to true
+        return;
+    }
 
     // Tell cargo to invalidate the built crate whenever the wrapper changes
     println!("cargo:rerun-if-changed=include/wrapper.h");
