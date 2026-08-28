@@ -1,6 +1,6 @@
 [package]
 name = "openssl_provider_forge"
-version = "0.10.2+dev"
+version = "0.10.2"
 edition = "2021"
 description = "Rust crate with FFI binding for the `Core` and `Provider` APIs of `OpenSSL 3.2+`"
 license = "Apache-2.0"
