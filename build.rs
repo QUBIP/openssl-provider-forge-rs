@@ -44,19 +44,21 @@ fn generate_bindings() {
         .header("include/wrapper.h")
         // Filter only headers from OpenSSL
         .allowlist_file(".*/openssl/.*\\.h")
+        // Do not recursively generate bindings for types from system headers
+        .allowlist_recursively(false)
         // Tell cargo to invalidate the built crate whenever any of the
         // included header files changed.
         .parse_callbacks(Box::new(bindgen::CargoCallbacks::new()))
         // Generate string constants as Cstrs instead of u8 arrays
         .generate_cstr(true)
+        // Filter out function types using va_list, which is platform-specific
+        .blocklist_type("OSSL_FUNC_core_vset_error_fn")
+        .blocklist_type("OSSL_FUNC_BIO_vprintf_fn")
+        .blocklist_type("OSSL_FUNC_BIO_vsnprintf_fn")
         // Use C tpes from the libc crate
         .ctypes_prefix("libc")
-        // filter out system typedefs like __off_t, size_t families
-        .blocklist_type("__?[a-z0-9_]+_t")
-        // filter out both _intmax_t and intmax_t, signed + unsigned
-        .blocklist_type("_?u?intmax_t")
-        // include required definitions for u?intmax_t from the libc crate
-        .raw_line("use libc::{intmax_t, uintmax_t};")
+        // Include required definitions for system types from the libc crate
+        .raw_line("use libc::*;")
         // Finish the builder and generate the bindings.
         .generate()
         // Unwrap the Result and panic on failure.
